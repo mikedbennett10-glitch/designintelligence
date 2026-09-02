@@ -1,0 +1,2 @@
+-- Seeds stub records for all Ambulatory room types.
+-- Full seed data added in a later commit.

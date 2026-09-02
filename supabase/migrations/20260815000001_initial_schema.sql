@@ -1,0 +1,2 @@
+-- Design Intelligence Platform (DIP) — initial schema.
+-- Full migration added in a later commit.
