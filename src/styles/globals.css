@@ -1,1 +1,73 @@
-/* brand tokens. Full token set added in a later commit. */
+/* ============================================================
+   the health system — Design Intelligence Platform
+   Brand tokens + base styles
+   ============================================================ */
+
+:root {
+  --brand-blue: #0076a8;
+  --brand-blue-lt: #e6f3f9;
+  --brand-blue-mid: #b3d8eb;
+  --brand-blue-dk: #005880;
+  --brand-pink: #e8006b;
+  --brand-pink-lt: #fde6f2;
+  --brand-charcoal: #54565a;
+  --brand-charcoal-lt: #f0efed;
+
+  --bg: #f5f4f1;
+  --surface: #ffffff;
+  --border: #e0ddd7;
+  --border-strong: #c8c5be;
+  --text: #1e1e1c;
+  --muted: #787570;
+  --hint: #b0ada7;
+
+  --font-ui: var(--font-source-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-doc: var(--font-source-serif), Georgia, "Times New Roman", serif;
+
+  --header-height: 64px;
+  --sidebar-width: 288px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-ui);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-doc);
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.5em;
+}
+
+a {
+  color: var(--brand-blue);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--brand-blue-dk);
+  text-decoration: underline;
+}
+
+img,
+svg {
+  max-width: 100%;
+}
