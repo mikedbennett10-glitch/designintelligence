@@ -1,0 +1,63 @@
+name: Deploy to Cloud Run
+
+on:
+  push:
+    branches: [main]
+
+env:
+  GCP_REGION: us-central1
+  ARTIFACT_REPO: dip
+  SERVICE_NAME: design-intelligence-platform
+  IMAGE: ${{ vars.GCP_REGION || 'us-central1' }}-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/dip/design-intelligence-platform
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: gcloud auth configure-docker ${{ env.GCP_REGION }}-docker.pkg.dev --quiet
+
+      - name: Build image
+        run: |
+          docker build -t "${{ env.IMAGE }}:${{ github.sha }}" -t "${{ env.IMAGE }}:latest" .
+
+      - name: Push image
+        run: |
+          docker push "${{ env.IMAGE }}:${{ github.sha }}"
+          docker push "${{ env.IMAGE }}:latest"
+
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.GCP_REGION }}
+          image: ${{ env.IMAGE }}:${{ github.sha }}
+          env_vars: |
+            NODE_ENV=production
+          secrets: |
+            NEXT_PUBLIC_SUPABASE_URL=NEXT_PUBLIC_SUPABASE_URL:latest
+            NEXT_PUBLIC_SUPABASE_ANON_KEY=NEXT_PUBLIC_SUPABASE_ANON_KEY:latest
+            SUPABASE_SERVICE_ROLE_KEY=SUPABASE_SERVICE_ROLE_KEY:latest
+            ANTHROPIC_API_KEY=ANTHROPIC_API_KEY:latest
+            PROCORE_CLIENT_ID=PROCORE_CLIENT_ID:latest
+            PROCORE_CLIENT_SECRET=PROCORE_CLIENT_SECRET:latest
+            PROCORE_BASE_URL=PROCORE_BASE_URL:latest
+            GCP_PROJECT_ID=GCP_PROJECT_ID:latest
+            GCS_BUCKET_ASSETS=GCS_BUCKET_ASSETS:latest
+            NEXTAUTH_SECRET=NEXTAUTH_SECRET:latest
