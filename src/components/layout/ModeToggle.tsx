@@ -4,8 +4,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const MODES = [
-  { label: "Ambulatory", href: "/guidelines/ambulatory" },
-  { label: "Acute", href: "/guidelines/acute" },
+  { label: "Ambulatory", href: "/ambulatory" },
+  { label: "Acute", href: "/acute" },
 ] as const;
 
 export default function ModeToggle() {

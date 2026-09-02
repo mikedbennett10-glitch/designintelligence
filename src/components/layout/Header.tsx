@@ -16,7 +16,7 @@ export default function Header() {
       }}
     >
       <Link
-        href="/guidelines/ambulatory"
+        href="/ambulatory"
         style={{
           display: "flex",
           alignItems: "baseline",

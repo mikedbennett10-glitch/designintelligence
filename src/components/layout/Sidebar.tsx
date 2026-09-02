@@ -81,7 +81,7 @@ export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
           </div>
           <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
             {sectionRooms.map((room) => {
-              const href = `/guidelines/ambulatory/rooms/${room.taxonomy_id}`;
+              const href = `/ambulatory/rooms/${room.taxonomy_id}`;
               const active = pathname === href;
               return (
                 <li key={room.taxonomy_id}>
