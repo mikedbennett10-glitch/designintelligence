@@ -1,64 +1,74 @@
 /**
  * Image Downloader — Google Apps Script
  *
- * Downloads images from URLs and saves them into Google Drive folders,
- * organized into groups. Fill in CONFIG below, then run from the
- * "Image Downloader" menu (open the bound Sheet, or run downloadAllImages
- * directly from the Apps Script editor).
+ * Reads (Folder Name, Image URL) rows from a Google Sheet tab and downloads
+ * each image into a matching Google Drive folder.
+ *
+ * SETUP:
+ *   1. This script must be bound to a Google Sheet (Extensions > Apps
+ *      Script from inside the Sheet) — that's what lets it find your data.
+ *   2. In that Sheet, create a tab named exactly as SHEET_NAME below
+ *      (default "URLs") with a header row and two columns:
+ *        A: Folder Name    B: Image URL
+ *      One row per image. Use the same folder name for every image that
+ *      belongs to that group — there's no limit to how many distinct
+ *      folder names (groups) you use.
+ *   3. Reload the Sheet and use the "Image Downloader" menu that appears,
+ *      or run downloadAllImages from the Apps Script editor.
  */
 
-const CONFIG = {
-  // Optional: put a Drive folder ID here to create the 6 group folders
-  // inside it. Leave blank ('') to create them in "My Drive" root.
-  parentFolderId: '',
+const SHEET_NAME = 'URLs';
 
-  groups: [
-    {
-      folderName: 'Group 1',
-      urls: [
-        // 'https://example.com/image1.jpg',
-        // 'https://example.com/image2.png',
-      ],
-    },
-    {
-      folderName: 'Group 2',
-      urls: [],
-    },
-    {
-      folderName: 'Group 3',
-      urls: [],
-    },
-    {
-      folderName: 'Group 4',
-      urls: [],
-    },
-    {
-      folderName: 'Group 5',
-      urls: [],
-    },
-    {
-      folderName: 'Group 6',
-      urls: [],
-    },
-  ],
-};
+// Optional: put a Drive folder ID here to create the group folders inside
+// it. Leave blank ('') to create them in "My Drive" root.
+const PARENT_FOLDER_ID = '';
 
 /**
- * Entry point: downloads every URL in CONFIG.groups into its folder.
+ * Entry point: reads every row from SHEET_NAME and downloads its image
+ * into the matching folder.
  */
 function downloadAllImages() {
-  const parent = getOrCreateParentFolder_(CONFIG.parentFolderId);
-  const results = [];
+  const rows = readUrlRows_();
+  if (rows.length === 0) {
+    const message =
+      'No rows found on the "' + SHEET_NAME + '" tab. Add a header row ' +
+      'plus rows of (Folder Name, Image URL) and try again.';
+    Logger.log(message);
+    notify_(message);
+    return [];
+  }
 
-  CONFIG.groups.forEach((group) => {
-    const folder = getOrCreateFolder_(parent, group.folderName);
-    group.urls.forEach((url, index) => {
-      results.push(downloadOneImage_(url, folder, index));
-    });
+  const parent = getOrCreateParentFolder_(PARENT_FOLDER_ID);
+  const folderCache = {};
+  const results = rows.map((row, index) => {
+    const folder = getCachedFolder_(folderCache, parent, row.folderName);
+    return downloadOneImage_(row.url, folder, index);
   });
 
   logSummary_(results);
+  notify_(summaryMessage_(results));
   return results;
+}
+
+/**
+ * Reads all data rows (skipping the header) from SHEET_NAME as
+ * { folderName, url } objects, skipping blank rows.
+ */
+function readUrlRows_() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  if (!sheet) {
+    throw new Error(
+      'No tab named "' + SHEET_NAME + '" found in this spreadsheet. ' +
+      'Create it with columns: Folder Name | Image URL.'
+    );
+  }
+
+  const values = sheet.getDataRange().getValues();
+  const dataRows = values.slice(1); // skip header row
+
+  return dataRows
+    .map((r) => ({ folderName: String(r[0] || '').trim(), url: String(r[1] || '').trim() }))
+    .filter((r) => r.folderName && r.url);
 }
 
 function getOrCreateParentFolder_(parentFolderId) {
@@ -66,6 +76,13 @@ function getOrCreateParentFolder_(parentFolderId) {
     return DriveApp.getFolderById(parentFolderId);
   }
   return DriveApp.getRootFolder();
+}
+
+function getCachedFolder_(cache, parent, name) {
+  if (!cache[name]) {
+    cache[name] = getOrCreateFolder_(parent, name);
+  }
+  return cache[name];
 }
 
 function getOrCreateFolder_(parent, name) {
@@ -127,19 +144,36 @@ function extensionFromContentType_(contentType) {
   return map[contentType] || '';
 }
 
-function logSummary_(results) {
+function summaryMessage_(results) {
   const ok = results.filter((r) => r.status === 'ok').length;
-  const failed = results.filter((r) => r.status === 'error');
+  const failedCount = results.length - ok;
+  return 'Downloaded ' + ok + ' of ' + results.length + ' images.' +
+    (failedCount ? ' ' + failedCount + ' failed — see execution log (View > Logs) for details.' : '');
+}
 
-  Logger.log('Downloaded %s of %s images.', ok, results.length);
-  failed.forEach((r) => {
-    Logger.log('FAILED: %s (%s) — %s', r.url, r.folder, r.error);
-  });
+function logSummary_(results) {
+  Logger.log(summaryMessage_(results));
+  results
+    .filter((r) => r.status === 'error')
+    .forEach((r) => {
+      Logger.log('FAILED: %s (%s) — %s', r.url, r.folder, r.error);
+    });
 }
 
 /**
- * Optional: adds a custom menu when the script is bound to a Google Sheet,
- * so you can trigger the download without opening the Apps Script editor.
+ * Shows a UI alert when run from a bound Sheet; falls back to just logging
+ * when run from the Apps Script editor with no active UI.
+ */
+function notify_(message) {
+  try {
+    SpreadsheetApp.getUi().alert(message);
+  } catch (err) {
+    // No UI available (e.g. run directly from the editor) — logging is enough.
+  }
+}
+
+/**
+ * Adds a custom menu when the Sheet is opened.
  */
 function onOpen() {
   SpreadsheetApp.getUi()
