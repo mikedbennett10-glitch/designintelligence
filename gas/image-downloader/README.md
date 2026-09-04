@@ -1,5 +1,18 @@
 # Image Downloader (Google Apps Script)
 
+Two variants are included — pick whichever fits how you want to manage
+your URLs:
+
+- **`Code.gs`** (recommended): URLs live in a Google Sheet, one row per
+  group. Easiest to edit without touching code.
+- **`Code-inline-urls.gs`**: URLs are typed directly into the script, in a
+  `CONFIG.groups` array keyed by Drive folder ID. Good if you'd rather
+  not use a Sheet at all. See the comments at the top of that file — copy
+  its contents in place of `Code.gs` and paste your URLs into each
+  group's `urls` array.
+
+## Sheet-based variant (`Code.gs`)
+
 Reads image URLs from a Google Sheet and downloads them straight into
 existing Google Drive folders — one row per group, all of that group's
 URLs pasted into a single cell.
