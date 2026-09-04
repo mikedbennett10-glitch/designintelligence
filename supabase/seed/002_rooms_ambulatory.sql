@@ -1,19 +1,25 @@
 -- ============================================================
--- Seed: Ambulatory room stubs (28 room types)
+-- Seed: Ambulatory room stubs — real taxonomy per DIP_WBS_v1.0.docx §2.1
 -- ============================================================
--- Stub records only — taxonomy_id, name, zone, section, guideline_type,
--- edition_id (March 2026), is_published=FALSE. All other fields are
--- populated as content development proceeds.
+-- Supersedes the earlier placeholder 28-room seed (2 invented Prototype
+-- Plan rooms + 4 invented Specialty/Ancillary rooms). WBS §2.1 "Room Data
+-- Sheet Population" gives the authoritative 35-room Ambulatory taxonomy
+-- across 5 work packages (2.1.1–2.1.5); every taxonomy_id and section
+-- grouping below is transcribed directly from it.
 --
--- NOTE (flagged, not assumed silently): the source prompt named 22 rooms
--- across "Clinic Planning" (8) and "Standard Rooms" (14) plus 2 Prototype
--- Plans and 2 Guidelines & Standards items (not rooms), but asked for stubs
--- covering "all 28 Ambulatory room types." To reach 28 distinct room
--- records this seed adds a 4-room "Specialty / Ancillary Rooms" section
--- (lab draw, x-ray, behavioral health consult, telehealth) alongside the 2
--- Prototype Plan rooms. Please confirm this room list against the actual
--- Ambulatory Design Guidelines room count — it's a reasonable placeholder
--- set, not a transcription of source content.
+-- Two things the WBS does NOT specify, flagged rather than assumed silently:
+--   - zone (On-Stage / Off-Stage): inferred from each room's function —
+--     please confirm against the ADG.
+--   - axon_type: WBS §3.2.1 classifies rooms into 3 drawing-treatment
+--     tiers via a "room type classification table" that isn't part of
+--     this document, so axon_type is left NULL (unclassified) for all
+--     rooms here rather than guessed.
+--
+-- Prototype Plans (Standard Flow, Convergent Flow — WBS §2.3) are NOT
+-- seeded as rooms: they're whole-clinic plan-level content with their own
+-- 6 drawing types (floorplan, adjacencies & flow, finish plan, RCP,
+-- security plan, wall types), not individual room taxonomy entries. They
+-- need a separate content model when that work package is built.
 
 DO $$
 DECLARE
@@ -21,47 +27,58 @@ DECLARE
 BEGIN
   SELECT id INTO v_edition_id FROM editions WHERE guideline_type = 'AMBULATORY' AND edition_code = 'MAR-2026';
 
-  -- ── Prototype Plans (2) ──────────────────────────────────
+  -- ── WBS 2.1.1 — Clinic Planning spaces (8) ───────────────
   INSERT INTO rooms (taxonomy_id, guideline_type, section, sort_order, name, zone, edition_id, is_published) VALUES
-    ('AMB-PROTO-STDFLOW-001',  'AMBULATORY', 'Prototype Plans', 10, 'Standard Flow Prototype Plan',     'On-Stage / Off-Stage', v_edition_id, FALSE),
-    ('AMB-PROTO-CONVFLOW-001', 'AMBULATORY', 'Prototype Plans', 20, 'Convergent Flow Prototype Plan',   'On-Stage / Off-Stage', v_edition_id, FALSE)
+    ('AMB-CLINIC-ARR-001',     'AMBULATORY', 'Clinic Planning', 10, 'Arrival / Check-in',           'On-Stage',             v_edition_id, FALSE),
+    ('AMB-CLINIC-ARR-002',     'AMBULATORY', 'Clinic Planning', 20, 'Arrival, Hello Center',         'On-Stage',             v_edition_id, FALSE),
+    ('AMB-CLINIC-PAUSE-001',   'AMBULATORY', 'Clinic Planning', 30, 'Arrival, Pause Corridor',       'On-Stage',             v_edition_id, FALSE),
+    ('AMB-CLINIC-SUBWAIT-001', 'AMBULATORY', 'Clinic Planning', 40, 'Arrival, Subwait Zone',         'On-Stage',             v_edition_id, FALSE),
+    ('AMB-CLINIC-WCOPY-001',   'AMBULATORY', 'Clinic Planning', 50, 'Arrival, Work / Copy',          'On-Stage / Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-BH-001',     'AMBULATORY', 'Clinic Planning', 60, 'Business Hub',                  'Off-Stage',            v_edition_id, FALSE),
+    ('AMB-CLINIC-SCHED-001',   'AMBULATORY', 'Clinic Planning', 70, 'Schedulers',                    'Off-Stage',            v_edition_id, FALSE),
+    ('AMB-ROOM-CO-001',        'AMBULATORY', 'Clinic Planning', 80, 'Conference Room',                'Off-Stage',            v_edition_id, FALSE)
   ON CONFLICT (taxonomy_id) DO NOTHING;
 
-  -- ── Clinic Planning rooms (8) ────────────────────────────
+  -- ── WBS 2.1.2 — Standard Rooms: Exam and Procedure (5) ───
   INSERT INTO rooms (taxonomy_id, guideline_type, section, sort_order, name, zone, edition_id, is_published) VALUES
-    ('AMB-CP-CHECKIN-001',     'AMBULATORY', 'Clinic Planning', 10, 'Check-In / Registration',   'On-Stage',              v_edition_id, FALSE),
-    ('AMB-CP-WAITING-001',     'AMBULATORY', 'Clinic Planning', 20, 'Waiting Area',               'On-Stage',              v_edition_id, FALSE),
-    ('AMB-CP-SUBWAIT-001',     'AMBULATORY', 'Clinic Planning', 30, 'Sub-Waiting',                'On-Stage',              v_edition_id, FALSE),
-    ('AMB-CP-INTAKE-001',      'AMBULATORY', 'Clinic Planning', 40, 'Intake / Rooming',           'On-Stage / Off-Stage',  v_edition_id, FALSE),
-    ('AMB-CP-TEAMSTATION-001', 'AMBULATORY', 'Clinic Planning', 50, 'Team Station',               'Off-Stage',             v_edition_id, FALSE),
-    ('AMB-CP-CONSULT-001',     'AMBULATORY', 'Clinic Planning', 60, 'Consult Room',               'On-Stage',              v_edition_id, FALSE),
-    ('AMB-CP-CHECKOUT-001',    'AMBULATORY', 'Clinic Planning', 70, 'Check-Out',                  'On-Stage',              v_edition_id, FALSE),
-    ('AMB-CP-HUDDLE-001',      'AMBULATORY', 'Clinic Planning', 80, 'Huddle / Touchdown Space',   'Off-Stage',             v_edition_id, FALSE)
+    ('AMB-ROOM-EX-001',   'AMBULATORY', 'Standard Rooms — Exam and Procedure', 10, 'Exam Room, Typical 2-Door', 'On-Stage', v_edition_id, FALSE),
+    ('AMB-ROOM-EX-002',   'AMBULATORY', 'Standard Rooms — Exam and Procedure', 20, 'Exam Room, Alt 1 1-Door',   'On-Stage', v_edition_id, FALSE),
+    ('AMB-ROOM-EX-003',   'AMBULATORY', 'Standard Rooms — Exam and Procedure', 30, 'Exam Room, Alt 2 1-Door',   'On-Stage', v_edition_id, FALSE),
+    ('AMB-ROOM-PROC-001', 'AMBULATORY', 'Standard Rooms — Exam and Procedure', 40, 'Procedure Room, Type I',    'On-Stage', v_edition_id, FALSE),
+    ('AMB-ROOM-PROC-002', 'AMBULATORY', 'Standard Rooms — Exam and Procedure', 50, 'Procedure Room, Type II',   'On-Stage', v_edition_id, FALSE)
   ON CONFLICT (taxonomy_id) DO NOTHING;
 
-  -- ── Standard Rooms (14) ───────────────────────────────────
+  -- ── WBS 2.1.3 — Standard Rooms: Consult and Office (6) ───
   INSERT INTO rooms (taxonomy_id, guideline_type, section, sort_order, name, zone, edition_id, is_published) VALUES
-    ('AMB-ROOM-EX-001',            'AMBULATORY', 'Standard Rooms', 10,  'Exam Room, Typical (2-Door)',      'On-Stage',   v_edition_id, FALSE),
-    ('AMB-ROOM-EX-002',            'AMBULATORY', 'Standard Rooms', 20,  'Exam Room, Procedure-Capable',     'On-Stage',   v_edition_id, FALSE),
-    ('AMB-ROOM-EXPD-001',          'AMBULATORY', 'Standard Rooms', 30,  'Exam Room, Pediatric',             'On-Stage',   v_edition_id, FALSE),
-    ('AMB-ROOM-PROC-001',          'AMBULATORY', 'Standard Rooms', 40,  'Procedure Room',                   'On-Stage',   v_edition_id, FALSE),
-    ('AMB-ROOM-CONSULT-001',       'AMBULATORY', 'Standard Rooms', 50,  'Provider Office / Consult',        'On-Stage',   v_edition_id, FALSE),
-    ('AMB-ROOM-NURSE-001',         'AMBULATORY', 'Standard Rooms', 60,  'Nurse Station',                    'Off-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-MEDPREP-001',       'AMBULATORY', 'Standard Rooms', 70,  'Medication Prep / Pyxis',          'Off-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-SOIL-001',          'AMBULATORY', 'Standard Rooms', 80,  'Soiled Utility',                   'Off-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-CLEAN-001',         'AMBULATORY', 'Standard Rooms', 90,  'Clean Utility / Supply',           'Off-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-TOILET-001',        'AMBULATORY', 'Standard Rooms', 100, 'Patient Toilet',                   'On-Stage',   v_edition_id, FALSE),
-    ('AMB-ROOM-STAFFTOILET-001',   'AMBULATORY', 'Standard Rooms', 110, 'Staff Toilet',                     'Off-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-STAFFLOUNGE-001',   'AMBULATORY', 'Standard Rooms', 120, 'Staff Lounge',                     'Off-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-STORAGE-001',       'AMBULATORY', 'Standard Rooms', 130, 'Equipment / Supply Storage',       'Off-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-IT-001',            'AMBULATORY', 'Standard Rooms', 140, 'IT / Telecom Closet',              'Off-Stage',  v_edition_id, FALSE)
+    ('AMB-ROOM-CN-001', 'AMBULATORY', 'Standard Rooms — Consult and Office', 10, 'Consult Room, Type 1',            'On-Stage',  v_edition_id, FALSE),
+    ('AMB-ROOM-CN-002', 'AMBULATORY', 'Standard Rooms — Consult and Office', 20, 'Consult Room, Behavioral Health', 'On-Stage',  v_edition_id, FALSE),
+    ('AMB-ROOM-OF-001', 'AMBULATORY', 'Standard Rooms — Consult and Office', 30, 'Office, Type 1 Private',          'Off-Stage', v_edition_id, FALSE),
+    ('AMB-ROOM-OF-002', 'AMBULATORY', 'Standard Rooms — Consult and Office', 40, 'Office, Type 2 Shared',           'Off-Stage', v_edition_id, FALSE),
+    ('AMB-ROOM-OF-003', 'AMBULATORY', 'Standard Rooms — Consult and Office', 50, 'Office, Type 3 Director',         'Off-Stage', v_edition_id, FALSE),
+    ('AMB-ROOM-OF-004', 'AMBULATORY', 'Standard Rooms — Consult and Office', 60, 'Office, Type 4 Manager',          'Off-Stage', v_edition_id, FALSE)
   ON CONFLICT (taxonomy_id) DO NOTHING;
 
-  -- ── Specialty / Ancillary Rooms (4) ──────────────────────
+  -- ── WBS 2.1.4 — Clinical Support Spaces (7) ──────────────
   INSERT INTO rooms (taxonomy_id, guideline_type, section, sort_order, name, zone, edition_id, is_published) VALUES
-    ('AMB-ROOM-LAB-001',        'AMBULATORY', 'Specialty / Ancillary Rooms', 10, 'Lab Draw Station',                  'On-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-XRAY-001',       'AMBULATORY', 'Specialty / Ancillary Rooms', 20, 'X-Ray Room',                        'On-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-BEHAV-001',      'AMBULATORY', 'Specialty / Ancillary Rooms', 30, 'Behavioral Health Consult Room',    'On-Stage',  v_edition_id, FALSE),
-    ('AMB-ROOM-TELEHEALTH-001', 'AMBULATORY', 'Specialty / Ancillary Rooms', 40, 'Telehealth Room',                   'On-Stage',  v_edition_id, FALSE)
+    ('AMB-SUPPORT-CM-001',    'AMBULATORY', 'Clinical Support Spaces', 10, 'Clean / Meds Zone',        'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-POCT-001',  'AMBULATORY', 'Clinical Support Spaces', 20, 'POC Testing, Urine',       'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-POCT-002',  'AMBULATORY', 'Clinical Support Spaces', 30, 'POC Testing, Blood',       'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-PAR-001',   'AMBULATORY', 'Clinical Support Spaces', 40, 'PAR Storage',              'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-IT-001',    'AMBULATORY', 'Clinical Support Spaces', 50, 'IT / Comm Room',           'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-BIO-001',   'AMBULATORY', 'Clinical Support Spaces', 60, 'Bio-Waste / Soiled Hold',  'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-EQUIP-001', 'AMBULATORY', 'Clinical Support Spaces', 70, 'Equipment Charging',       'Off-Stage', v_edition_id, FALSE)
+  ON CONFLICT (taxonomy_id) DO NOTHING;
+
+  -- ── WBS 2.1.5 — Staff Support Spaces (9) ─────────────────
+  INSERT INTO rooms (taxonomy_id, guideline_type, section, sort_order, name, zone, edition_id, is_published) VALUES
+    ('AMB-SUPPORT-SL-001',    'AMBULATORY', 'Staff Support Spaces', 10, 'Staff Lounge',                'Off-Stage', v_edition_id, FALSE),
+    ('AMB-TOILET-PT-001',     'AMBULATORY', 'Staff Support Spaces', 20, 'Toilet, Patient',              'On-Stage',  v_edition_id, FALSE),
+    ('AMB-TOILET-FT-001',     'AMBULATORY', 'Staff Support Spaces', 30, 'Toilet, Public / Family',      'On-Stage',  v_edition_id, FALSE),
+    ('AMB-TOILET-ST-001',     'AMBULATORY', 'Staff Support Spaces', 40, 'Toilet, Staff',                'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-EV-001',    'AMBULATORY', 'Staff Support Spaces', 50, 'EVS Closet',                   'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-BRKDN-001', 'AMBULATORY', 'Staff Support Spaces', 60, 'Breakdown Room',               'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-MOM-001',   'AMBULATORY', 'Staff Support Spaces', 70, 'Mother''s Room',               'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-ZEN-001',   'AMBULATORY', 'Staff Support Spaces', 80, 'Zen Den',                      'Off-Stage', v_edition_id, FALSE),
+    ('AMB-SUPPORT-LOCK-001',  'AMBULATORY', 'Staff Support Spaces', 90, 'Half-Height Lockers',          'Off-Stage', v_edition_id, FALSE)
   ON CONFLICT (taxonomy_id) DO NOTHING;
 END $$;
