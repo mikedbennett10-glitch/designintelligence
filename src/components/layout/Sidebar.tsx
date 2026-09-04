@@ -9,17 +9,26 @@ export interface SidebarRoomItem {
   section: string;
 }
 
+// Matches DIP_WBS_v1.0.docx §2.1's five room-population work packages.
 const ROOM_SECTION_ORDER = [
-  "Prototype Plans",
   "Clinic Planning",
-  "Standard Rooms",
-  "Specialty / Ancillary Rooms",
+  "Standard Rooms — Exam and Procedure",
+  "Standard Rooms — Consult and Office",
+  "Clinical Support Spaces",
+  "Staff Support Spaces",
 ];
 
 interface StaticNavItem {
   label: string;
   href?: string;
 }
+
+// WBS §2.3: whole-clinic plan-level content (its own 6 drawing types),
+// not individual room taxonomy entries — no content model yet.
+const PROTOTYPE_PLANS: StaticNavItem[] = [
+  { label: "Standard Flow" },
+  { label: "Convergent Flow" },
+];
 
 const GUIDELINES_AND_STANDARDS: StaticNavItem[] = [
   { label: "Finish Schedule" },
@@ -64,6 +73,8 @@ export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
         padding: "1.25rem 0",
       }}
     >
+      <StaticGroup title="Prototype Plans" items={PROTOTYPE_PLANS} />
+
       {groups.map(({ section, rooms: sectionRooms }) => (
         <div key={section} style={{ marginBottom: "1.5rem" }}>
           <div
