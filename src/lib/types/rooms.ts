@@ -155,6 +155,87 @@ export interface RoomFurniture {
   sort_order: number;
 }
 
+export interface RoomDecisionLogicItem {
+  id: number;
+  room_taxonomy_id: string;
+  category: string | null;
+  content: string;
+  edition_id: number | null;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface RoomIntentionalOmission {
+  id: number;
+  room_taxonomy_id: string;
+  item: string;
+  rationale: string;
+  edition_id: number | null;
+  sort_order: number;
+  created_at: string;
+}
+
+export type DrawingType =
+  | "fp"
+  | "rcp"
+  | "elev-n"
+  | "elev-s"
+  | "elev-e"
+  | "elev-w"
+  | "axon"
+  | "det";
+
+export interface RoomDrawing {
+  id: number;
+  room_taxonomy_id: string;
+  drawing_type: DrawingType;
+  version: string;
+  format: "svg" | "png" | "pdf";
+  gcs_path: string | null;
+  file_name: string | null;
+  status: "ready" | "pending" | "superseded";
+  is_schematic: boolean;
+  file_size_bytes: number | null;
+  created_at: string;
+}
+
+export interface EditionChangeItem {
+  id: number;
+  edition_id: number;
+  page: string | null;
+  section: string;
+  title: string;
+  change_type: "N" | "M" | "E";
+  description: string;
+  room_taxonomy_id: string | null;
+  sort_order: number;
+  created_at: string;
+}
+
+/** A room_finishes row joined with its finishes record. */
+export interface RoomFinishWithDetail extends RoomFinish {
+  finish: Pick<
+    Finish,
+    "code" | "product_type" | "description" | "manufacturer" | "product_name" | "color"
+  > | null;
+}
+
+/** A room_equipment row joined with its equipment record. */
+export interface RoomEquipmentWithDetail extends RoomEquipment {
+  equipment: Pick<
+    Equipment,
+    "taxonomy_id" | "name" | "category" | "responsibility" | "manufacturer" | "model"
+  > | null;
+}
+
+/** A room_furniture row joined with its furniture record. */
+export interface RoomFurnitureWithDetail extends RoomFurniture {
+  furniture: Pick<
+    Furniture,
+    "taxonomy_id" | "name" | "category" | "responsibility" | "manufacturer" | "model"
+  > | null;
+}
+
 /** Drawing readiness rollup, matches the `room_drawing_status` view. */
 export interface RoomDrawingStatus {
   taxonomy_id: string;
