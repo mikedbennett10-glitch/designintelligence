@@ -1,48 +1,57 @@
 /**
  * Image Downloader — Google Apps Script
  *
- * Reads (Folder Name, Image URL) rows from a Google Sheet tab and downloads
- * each image into a matching Google Drive folder.
+ * Reads (Folder ID, URLs) rows from a Google Sheet tab — one row per
+ * group, with all of that group's image URLs pasted into a single cell —
+ * and downloads each image into the matching Google Drive folder.
  *
  * SETUP:
  *   1. This script must be bound to a Google Sheet (Extensions > Apps
  *      Script from inside the Sheet) — that's what lets it find your data.
  *   2. In that Sheet, create a tab named exactly as SHEET_NAME below
  *      (default "URLs") with a header row and two columns:
- *        A: Folder Name    B: Image URL
- *      One row per image. Use the same folder name for every image that
- *      belongs to that group — there's no limit to how many distinct
- *      folder names (groups) you use.
+ *        A: Folder ID    B: Image URLs
+ *      One row per group. Column A is the destination Drive folder's ID
+ *      (the part of its URL after .../folders/). Column B holds all of
+ *      that group's URLs pasted into the single cell — one per line
+ *      works best (double-click the cell to enter edit mode before
+ *      pasting so it lands in one cell instead of spreading across
+ *      rows); URLs separated by commas or spaces also work.
  *   3. Reload the Sheet and use the "Image Downloader" menu that appears,
  *      or run downloadAllImages from the Apps Script editor.
  */
 
 const SHEET_NAME = 'URLs';
 
-// Optional: put a Drive folder ID here to create the group folders inside
-// it. Leave blank ('') to create them in "My Drive" root.
-const PARENT_FOLDER_ID = '';
-
 /**
- * Entry point: reads every row from SHEET_NAME and downloads its image
- * into the matching folder.
+ * Entry point: reads every row from SHEET_NAME and downloads that row's
+ * URLs into the folder identified by its Folder ID.
  */
 function downloadAllImages() {
-  const rows = readUrlRows_();
+  const rows = readGroupRows_();
   if (rows.length === 0) {
     const message =
       'No rows found on the "' + SHEET_NAME + '" tab. Add a header row ' +
-      'plus rows of (Folder Name, Image URL) and try again.';
+      'plus rows of (Folder ID, Image URLs) and try again.';
     Logger.log(message);
     notify_(message);
     return [];
   }
 
-  const parent = getOrCreateParentFolder_(PARENT_FOLDER_ID);
-  const folderCache = {};
-  const results = rows.map((row, index) => {
-    const folder = getCachedFolder_(folderCache, parent, row.folderName);
-    return downloadOneImage_(row.url, folder, index);
+  const results = [];
+  rows.forEach((row) => {
+    let folder;
+    try {
+      folder = DriveApp.getFolderById(row.folderId);
+    } catch (err) {
+      row.urls.forEach((url) => {
+        results.push({ url: url, folder: row.folderId, status: 'error', error: 'Invalid Folder ID: ' + row.folderId });
+      });
+      return;
+    }
+    row.urls.forEach((url, index) => {
+      results.push(downloadOneImage_(url, folder, index));
+    });
   });
 
   logSummary_(results);
@@ -52,14 +61,14 @@ function downloadAllImages() {
 
 /**
  * Reads all data rows (skipping the header) from SHEET_NAME as
- * { folderName, url } objects, skipping blank rows.
+ * { folderId, urls } objects, skipping blank rows.
  */
-function readUrlRows_() {
+function readGroupRows_() {
   const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
   if (!sheet) {
     throw new Error(
       'No tab named "' + SHEET_NAME + '" found in this spreadsheet. ' +
-      'Create it with columns: Folder Name | Image URL.'
+      'Create it with columns: Folder ID | Image URLs.'
     );
   }
 
@@ -67,30 +76,20 @@ function readUrlRows_() {
   const dataRows = values.slice(1); // skip header row
 
   return dataRows
-    .map((r) => ({ folderName: String(r[0] || '').trim(), url: String(r[1] || '').trim() }))
-    .filter((r) => r.folderName && r.url);
+    .map((r) => ({
+      folderId: String(r[0] || '').trim(),
+      urls: extractUrls_(String(r[1] || '')),
+    }))
+    .filter((r) => r.folderId && r.urls.length > 0);
 }
 
-function getOrCreateParentFolder_(parentFolderId) {
-  if (parentFolderId) {
-    return DriveApp.getFolderById(parentFolderId);
-  }
-  return DriveApp.getRootFolder();
-}
-
-function getCachedFolder_(cache, parent, name) {
-  if (!cache[name]) {
-    cache[name] = getOrCreateFolder_(parent, name);
-  }
-  return cache[name];
-}
-
-function getOrCreateFolder_(parent, name) {
-  const existing = parent.getFoldersByName(name);
-  if (existing.hasNext()) {
-    return existing.next();
-  }
-  return parent.createFolder(name);
+/**
+ * Pulls every http(s) URL out of a block of text, regardless of whether
+ * they're separated by newlines, commas, spaces, or a mix.
+ */
+function extractUrls_(text) {
+  const matches = text.match(/https?:\/\/\S+/g) || [];
+  return matches.map((url) => url.replace(/[,\s]+$/, ''));
 }
 
 /**

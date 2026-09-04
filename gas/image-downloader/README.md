@@ -1,7 +1,8 @@
 # Image Downloader (Google Apps Script)
 
-Reads image URLs from a Google Sheet and downloads them into Google Drive,
-organized into folders by group.
+Reads image URLs from a Google Sheet and downloads them straight into
+existing Google Drive folders — one row per group, all of that group's
+URLs pasted into a single cell.
 
 ## Setup
 
@@ -18,15 +19,20 @@ organized into folders by group.
    `SHEET_NAME` at the top of `Code.gs` to match a tab name you prefer)
    with a header row and two columns:
 
-   | Folder Name | Image URL |
+   | Folder ID | Image URLs |
    |---|---|
-   | Group 1 | https://example.com/a.jpg |
-   | Group 1 | https://example.com/b.jpg |
-   | Group 2 | https://example.com/c.png |
-   | ... | ... |
+   | 1AbCdEfGhIjKlMnOpQrStUvWxYz | https://example.com/a.jpg<br>https://example.com/b.jpg<br>https://example.com/c.jpg |
+   | 1ZzYyXxWwVvUuTtSsRrQqPpOoNn | https://example.com/d.png<br>https://example.com/e.png |
 
-   Use the same `Folder Name` for every row that belongs to that group —
-   for your 6 groups, that's 6 distinct folder names across the rows.
+   One row per group (6 rows for your 6 groups):
+   - **Folder ID** — the destination Drive folder's ID, taken from its
+     URL: `drive.google.com/drive/folders/<THIS PART>`. The folder must
+     already exist and you must have edit access to it.
+   - **Image URLs** — all of that group's URLs pasted into the *same
+     cell*. To get a list to land in one cell instead of spreading across
+     rows: double-click the cell to enter edit mode first, then paste.
+     One URL per line works best; URLs separated by commas or spaces also
+     work.
 6. Reload the Sheet's browser tab so the new **Image Downloader** menu
    appears.
 
@@ -41,26 +47,18 @@ You'll get a confirmation popup (or, when run from the editor, an entry in
 **View → Executions → logs**) summarizing how many images downloaded and
 how many failed.
 
-## Configuration
-
-At the top of `Code.gs`:
-
-- `SHEET_NAME` — the tab holding your (Folder Name, Image URL) rows.
-  Defaults to `'URLs'`.
-- `PARENT_FOLDER_ID` — optional Drive folder ID to create the group
-  folders inside. Leave `''` to create them directly in "My Drive". Get a
-  folder's ID from its URL: `drive.google.com/drive/folders/<THIS PART>`.
-
 ## Behavior
 
-- Folders are created if they don't already exist (matched by name), and
-  reused if they do — safe to re-run without duplicating folders.
-- Each URL is downloaded independently; a failed URL is recorded in the
-  execution log without stopping the rest of the batch.
+- Each group's cell is scanned for every `http(s)://...` URL it contains,
+  regardless of whether they're separated by line breaks, commas, or
+  spaces.
+- Each URL is downloaded independently; a failed URL (bad link, or an
+  invalid/inaccessible Folder ID) is recorded without stopping the rest
+  of the batch.
 - File names are taken from the URL's last path segment when it has a
   recognizable extension; otherwise a name like `image_3.jpg` is generated
   from the response's content type.
-- Blank rows, or rows missing a folder name or URL, are skipped.
+- Rows missing a Folder ID or containing no URLs are skipped.
 
 ## Troubleshooting "no images were pulled"
 
@@ -68,5 +66,7 @@ At the top of `Code.gs`:
   Extensions → Apps Script), not a standalone script at script.google.com.
 - Make sure the tab is named exactly `URLs` (or matches `SHEET_NAME`).
 - Make sure row 1 is a header — data starts on row 2.
+- Make sure each Folder ID is correct and you have edit access to that
+  folder.
 - Check **View → Executions** in the Apps Script editor for the specific
   error or per-row failure reasons.
