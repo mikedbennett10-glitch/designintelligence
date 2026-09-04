@@ -29,10 +29,18 @@ const SHEET_NAME = 'URLs';
  */
 function downloadAllImages() {
   const rows = readGroupRows_();
+
+  Logger.log('Parsed %s usable row(s) from "%s".', rows.length, SHEET_NAME);
+  rows.forEach((row, i) => {
+    Logger.log('Row %s: folderId="%s", %s URL(s) found', i + 1, row.folderId, row.urls.length);
+  });
+
   if (rows.length === 0) {
     const message =
-      'No rows found on the "' + SHEET_NAME + '" tab. Add a header row ' +
-      'plus rows of (Folder ID, Image URLs) and try again.';
+      'No rows found on the "' + SHEET_NAME + '" tab. Each row needs a ' +
+      'Folder ID in column A and at least one http(s) URL in column B. ' +
+      'Check View > Executions in the Apps Script editor for a row-by-row ' +
+      'breakdown of what was read.';
     Logger.log(message);
     notify_(message);
     return [];
@@ -73,6 +81,7 @@ function readGroupRows_() {
   }
 
   const values = sheet.getDataRange().getValues();
+  Logger.log('"%s" tab has %s total row(s) (including header).', SHEET_NAME, values.length);
   const dataRows = values.slice(1); // skip header row
 
   return dataRows
