@@ -2,7 +2,20 @@ import Link from "next/link";
 
 import ModeToggle from "@/components/layout/ModeToggle";
 
-export default function Header() {
+export interface HeaderUser {
+  email: string;
+  displayName: string;
+  tier: string;
+}
+
+const TIER_LABELS: Record<string, string> = {
+  internal_standard: "Internal",
+  external_project: "External · Project",
+  external_review: "External · Review",
+  administrative: "Administrator",
+};
+
+export default function Header({ user }: { user: HeaderUser | null }) {
   return (
     <header
       style={{
@@ -39,7 +52,49 @@ export default function Header() {
         </span>
       </Link>
 
-      <ModeToggle />
+      <div style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}>
+        <ModeToggle />
+
+        {user ? (
+          <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <div style={{ textAlign: "right", lineHeight: 1.3 }}>
+              <div style={{ fontSize: "0.8rem", fontWeight: 600 }}>{user.displayName}</div>
+              <div style={{ fontSize: "0.7rem", color: "var(--muted)" }}>
+                {TIER_LABELS[user.tier] ?? user.tier}
+              </div>
+            </div>
+            <form action="/auth/signout" method="post">
+              <button
+                type="submit"
+                style={{
+                  appearance: "none",
+                  background: "none",
+                  border: "1px solid var(--border-strong)",
+                  borderRadius: "6px",
+                  padding: "0.35rem 0.7rem",
+                  fontSize: "0.75rem",
+                  color: "var(--muted)",
+                  cursor: "pointer",
+                }}
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+        ) : (
+          <Link
+            href="/login"
+            style={{
+              fontSize: "0.8rem",
+              fontWeight: 600,
+              color: "var(--csh-blue-dk)",
+              textDecoration: "none",
+            }}
+          >
+            Sign in
+          </Link>
+        )}
+      </div>
     </header>
   );
 }
