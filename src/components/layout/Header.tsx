@@ -54,6 +54,12 @@ export default function Header({ user }: { user: HeaderUser | null }) {
 
         {user ? (
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <Link
+              href="/projects"
+              style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--csh-blue-dk)" }}
+            >
+              Projects
+            </Link>
             {user.tier === "administrative" && (
               <Link
                 href="/admin/users/new"
