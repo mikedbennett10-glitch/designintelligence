@@ -10,10 +10,12 @@ export interface SubmitDeviationResult {
 }
 
 /**
- * Submits a deviation request (WBS 7.1). Runs under the caller's own
- * session (not a service-role client) so the member_submit_deviation RLS
- * policy — is_project_member(project_id) AND submitted_by = the caller's
- * own email — does the membership check for us; there's no separate
+ * Submits a deviation request (WBS 7.1), or a general suggestion against
+ * the current edition when projectId is null (no project context). Runs
+ * under the caller's own session (not a service-role client) so the
+ * member_submit_deviation RLS policy — (project_id IS NULL OR
+ * is_project_member(project_id)) AND submitted_by = the caller's own
+ * email — does the membership check for us; there's no separate
  * server-side membership check to keep in sync with that policy.
  *
  * reference_number is set by the deviation_reference_trigger AFTER
@@ -30,7 +32,8 @@ export async function submitDeviation(
     return { ok: false, message: "Sign in to submit a deviation request." };
   }
 
-  const projectId = Number(formData.get("projectId"));
+  const projectIdRaw = String(formData.get("projectId") ?? "").trim();
+  const projectId = projectIdRaw ? Number(projectIdRaw) : null;
   const roomTaxonomyId = String(formData.get("roomTaxonomyId") ?? "").trim();
   const editionId = Number(formData.get("editionId"));
   const standardElement = String(formData.get("standardElement") ?? "").trim();
@@ -66,7 +69,9 @@ export async function submitDeviation(
   if (error || !inserted) {
     return {
       ok: false,
-      message: `Couldn't submit the request: ${error?.message ?? "unknown error"}. You may need to be a member of this project.`,
+      message: `Couldn't submit the request: ${error?.message ?? "unknown error"}${
+        projectId ? " You may need to be a member of this project." : ""
+      }`,
     };
   }
 
