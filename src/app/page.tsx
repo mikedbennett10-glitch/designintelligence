@@ -11,16 +11,19 @@ const GUIDELINE_MODES = [
     label: "Ambulatory",
     href: "/ambulatory",
     description: "Room data sheets, prototype plans, and standards for ambulatory facilities.",
+    comingSoon: false,
   },
   {
     label: "Acute",
     href: "/acute",
     description: "Room data sheets and standards for acute care facilities.",
+    comingSoon: true,
   },
   {
     label: "Building Performance",
     href: "/building-performance",
     description: "Envelope, systems, and sustainability standards.",
+    comingSoon: true,
   },
 ] as const;
 
@@ -132,24 +135,21 @@ export default async function HomePage() {
               gap: "1rem",
             }}
           >
-            {GUIDELINE_MODES.map((mode) => (
-              <Link
-                key={mode.href}
-                href={mode.href}
-                style={{
-                  display: "block",
-                  padding: "1.25rem",
-                  border: "1px solid var(--border)",
-                  borderRadius: "10px",
-                  background: "var(--surface)",
-                  textDecoration: "none",
-                  color: "var(--text)",
-                }}
-              >
-                <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{mode.label}</div>
-                <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>{mode.description}</div>
-              </Link>
-            ))}
+            {GUIDELINE_MODES.map((mode) =>
+              mode.comingSoon ? (
+                <div key={mode.href} className="mode-card mode-card--disabled">
+                  <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{mode.label}</div>
+                  <div style={{ fontSize: "0.82rem" }}>Coming soon</div>
+                </div>
+              ) : (
+                <Link key={mode.href} href={mode.href} className="mode-card">
+                  <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{mode.label}</div>
+                  <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
+                    {mode.description}
+                  </div>
+                </Link>
+              )
+            )}
           </div>
         </section>
 

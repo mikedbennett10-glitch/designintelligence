@@ -71,3 +71,31 @@ img,
 svg {
   max-width: 100%;
 }
+
+.mode-card {
+  display: block;
+  padding: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  text-decoration: none;
+  color: var(--text);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.mode-card:hover {
+  border-color: var(--csh-pink);
+  box-shadow: 0 4px 10px rgba(219, 107, 219, 0.25);
+  text-decoration: none;
+}
+
+.mode-card--disabled {
+  cursor: default;
+  background: var(--csh-charcoal-lt);
+  color: var(--hint);
+}
+
+.mode-card--disabled:hover {
+  border-color: var(--border);
+  box-shadow: none;
+}
