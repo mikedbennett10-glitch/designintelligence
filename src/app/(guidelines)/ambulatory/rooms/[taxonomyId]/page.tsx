@@ -5,6 +5,7 @@ import RoomLockContextBanner from "@/components/guidelines/RoomLockContextBanner
 import type { VersionHistoryEntry } from "@/components/guidelines/VersionHistory";
 import { getActiveProject } from "@/lib/projectContext";
 import { createClient } from "@/lib/supabase/server";
+import type { ProjectWithEdition } from "@/lib/types/projects";
 import type {
   Room,
   RoomDecisionLogicItem,
@@ -33,7 +34,11 @@ interface RoomPageData {
   } | null;
 }
 
-async function getRoomPageData(taxonomyId: string, compareLive: boolean): Promise<RoomPageData | null> {
+async function getRoomPageData(
+  taxonomyId: string,
+  compareLive: boolean,
+  activeProject: ProjectWithEdition | null
+): Promise<RoomPageData | null> {
   const supabase = await createClient();
 
   const { data: room, error: roomError } = await supabase
@@ -48,7 +53,7 @@ async function getRoomPageData(taxonomyId: string, compareLive: boolean): Promis
   // WBS 6.4.1: while in Project mode with a locked edition, a room data
   // sheet shows that edition's content, not the live row — unless the
   // viewer explicitly asked to compare against the current guideline.
-  const activeProject = compareLive ? null : await getActiveProject();
+  if (compareLive) activeProject = null;
   let resolvedRoom = liveRoom;
   let lockContext: RoomPageData["lockContext"] = null;
 
@@ -162,12 +167,13 @@ export default async function RoomDataSheetPage({
 }) {
   const { taxonomyId } = await params;
   const { compareLive } = await searchParams;
+  const activeProject = await getActiveProject();
 
   let data: RoomPageData | null = null;
   let loadError: string | null = null;
 
   try {
-    data = await getRoomPageData(taxonomyId, compareLive === "1");
+    data = await getRoomPageData(taxonomyId, compareLive === "1", activeProject);
   } catch (err) {
     loadError = err instanceof Error ? err.message : "Unable to load this room.";
   }
@@ -225,6 +231,25 @@ export default async function RoomDataSheetPage({
           changes={data.lockContext.changes}
           taxonomyId={taxonomyId}
         />
+      )}
+      {activeProject && (
+        <div style={{ marginBottom: "1.5rem" }}>
+          <Link
+            href={`/projects/${activeProject.id}/deviations/new?room=${taxonomyId}`}
+            style={{
+              display: "inline-block",
+              padding: "0.45rem 0.85rem",
+              borderRadius: "6px",
+              border: "1px solid var(--csh-pink)",
+              color: "var(--csh-pink)",
+              fontSize: "0.82rem",
+              fontWeight: 600,
+              textDecoration: "none",
+            }}
+          >
+            Submit a deviation request for this room
+          </Link>
+        </div>
       )}
       <RoomDataSheet {...data} />
     </div>

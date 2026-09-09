@@ -62,6 +62,14 @@ export default function Header({ user }: { user: HeaderUser | null }) {
             </Link>
             {user.tier === "administrative" && (
               <Link
+                href="/admin/deviations"
+                style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--csh-blue-dk)" }}
+              >
+                Deviations
+              </Link>
+            )}
+            {user.tier === "administrative" && (
+              <Link
                 href="/admin/users/new"
                 style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--csh-blue-dk)" }}
               >

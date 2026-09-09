@@ -7,9 +7,32 @@ import type { Project } from "@/lib/types/projects";
 
 import LockEditionButton from "./LockEditionButton";
 
+const DEVIATION_STATUS_LABELS: Record<string, string> = {
+  pending: "Pending",
+  approved: "Approved",
+  approved_with_conditions: "Approved with conditions",
+  denied: "Denied",
+};
+
+const DEVIATION_STATUS_COLORS: Record<string, { bg: string; fg: string }> = {
+  pending: { bg: "#fdf1da", fg: "#8a5a00" },
+  approved: { bg: "var(--csh-blue-lt)", fg: "var(--csh-blue-dk)" },
+  approved_with_conditions: { bg: "var(--csh-blue-lt)", fg: "var(--csh-blue-dk)" },
+  denied: { bg: "var(--csh-pink-lt)", fg: "var(--csh-pink)" },
+};
+
 interface RoomRef {
   taxonomy_id: string;
   name: string;
+}
+
+interface DeviationSummary {
+  id: number;
+  reference_number: string | null;
+  room_taxonomy_id: string;
+  room_name: string;
+  standard_element: string;
+  status: string;
 }
 
 interface DeltaEntry {
@@ -26,6 +49,7 @@ interface ProjectDetail {
   currentEditionName: string | null;
   roomsInScope: RoomRef[];
   delta: DeltaEntry[];
+  deviations: DeviationSummary[];
 }
 
 async function getProjectDetail(id: number): Promise<ProjectDetail | null> {
@@ -67,12 +91,27 @@ async function getProjectDetail(id: number): Promise<ProjectDetail | null> {
     }
   }
 
+  // WBS 6.4.5 — project dashboard deviation summary. RLS already scopes
+  // this to admins or members of this project, same as the project fetch
+  // above, so no extra filtering is needed here.
+  const { data: deviations } = await supabase
+    .from("deviations")
+    .select("id, reference_number, room_taxonomy_id, standard_element, status, room:rooms(name)")
+    .eq("project_id", id)
+    .order("submitted_at", { ascending: false });
+
+  type DeviationRow = Record<string, unknown> & { room: { name: string } | null };
+  const deviationSummaries: DeviationSummary[] = ((deviations ?? []) as unknown as DeviationRow[]).map(
+    (d) => ({ ...(d as unknown as DeviationSummary), room_name: d.room?.name ?? String(d.room_taxonomy_id) })
+  );
+
   return {
     project: typedProject,
     lockedEditionName: (lockedEdition as unknown as { name: string } | null)?.name ?? null,
     currentEditionName: (currentEdition as unknown as { name: string } | null)?.name ?? null,
     roomsInScope: (rooms ?? []) as RoomRef[],
     delta,
+    deviations: deviationSummaries,
   };
 }
 
@@ -120,7 +159,7 @@ export default async function ProjectDetailPage({
     );
   }
 
-  const { project, lockedEditionName, currentEditionName, roomsInScope, delta } = detail;
+  const { project, lockedEditionName, currentEditionName, roomsInScope, delta, deviations } = detail;
   const primaryGuidelineType = project.guideline_types[0] ?? "AMBULATORY";
   const isCurrent = lockedEditionName && lockedEditionName === currentEditionName;
 
@@ -236,6 +275,51 @@ export default async function ProjectDetailPage({
           </ul>
         </section>
       )}
+
+      <section style={{ marginBottom: "1.5rem" }}>
+        <h2 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>
+          Deviation requests ({deviations.length})
+        </h2>
+        {deviations.length === 0 ? (
+          <p style={{ color: "var(--hint)", fontStyle: "italic" }}>None submitted yet.</p>
+        ) : (
+          <ul style={{ margin: 0, padding: 0, listStyle: "none" }}>
+            {deviations.map((d) => (
+              <li
+                key={d.id}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "center",
+                  padding: "0.5rem 0",
+                  borderBottom: "1px solid var(--border)",
+                  fontSize: "0.85rem",
+                }}
+              >
+                <span>
+                  <Link href={`/ambulatory/rooms/${d.room_taxonomy_id}`} style={{ color: "var(--csh-blue-dk)", fontWeight: 600 }}>
+                    {d.room_name}
+                  </Link>
+                  <span style={{ color: "var(--muted)" }}> — {d.standard_element}</span>
+                </span>
+                <span
+                  style={{
+                    flexShrink: 0,
+                    fontSize: "0.68rem",
+                    fontWeight: 700,
+                    padding: "0.15rem 0.5rem",
+                    borderRadius: "999px",
+                    background: DEVIATION_STATUS_COLORS[d.status]?.bg ?? "var(--csh-charcoal-lt)",
+                    color: DEVIATION_STATUS_COLORS[d.status]?.fg ?? "var(--muted)",
+                  }}
+                >
+                  {DEVIATION_STATUS_LABELS[d.status] ?? d.status}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
 
       <section>
         <h2 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>
