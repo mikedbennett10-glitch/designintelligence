@@ -1,12 +1,9 @@
 import Link from "next/link";
 
 import ModeToggle from "@/components/layout/ModeToggle";
+import type { CurrentUser } from "@/lib/auth";
 
-export interface HeaderUser {
-  email: string;
-  displayName: string;
-  tier: string;
-}
+export type HeaderUser = CurrentUser;
 
 const TIER_LABELS: Record<string, string> = {
   internal_standard: "Internal",
@@ -57,6 +54,14 @@ export default function Header({ user }: { user: HeaderUser | null }) {
 
         {user ? (
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            {user.tier === "administrative" && (
+              <Link
+                href="/admin/users/new"
+                style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--csh-blue-dk)" }}
+              >
+                Provision user
+              </Link>
+            )}
             <div style={{ textAlign: "right", lineHeight: 1.3 }}>
               <div style={{ fontSize: "0.8rem", fontWeight: 600 }}>{user.displayName}</div>
               <div style={{ fontSize: "0.7rem", color: "var(--muted)" }}>
