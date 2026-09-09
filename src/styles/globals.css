@@ -8,8 +8,8 @@
   --brand-blue-lt: #e6f3f9;
   --brand-blue-mid: #b3d8eb;
   --brand-blue-dk: #005880;
-  --brand-pink: #e8006b;
-  --brand-pink-lt: #fde6f2;
+  --brand-pink: #db6bdb;
+  --brand-pink-lt: #fae9fa;
   --brand-charcoal: #54565a;
   --brand-charcoal-lt: #f0efed;
 
@@ -21,8 +21,8 @@
   --muted: #787570;
   --hint: #b0ada7;
 
-  --font-ui: var(--font-source-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-  --font-doc: var(--font-source-serif), Georgia, "Times New Roman", serif;
+  --font-ui: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-doc: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
   --header-height: 64px;
   --sidebar-width: 288px;
