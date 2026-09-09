@@ -36,7 +36,9 @@ const GUIDELINES_AND_STANDARDS: StaticNavItem[] = [
   { label: "Furniture / FF&E Schedule", href: "/furniture" },
 ];
 
-const ABOUT_THIS_DOCUMENT: StaticNavItem[] = [{ label: "Version History" }];
+const ABOUT_THIS_DOCUMENT: StaticNavItem[] = [
+  { label: "Version History", href: "/version-history" },
+];
 
 function groupRoomsBySection(rooms: SidebarRoomItem[]) {
   const bySection = new Map<string, SidebarRoomItem[]>();
