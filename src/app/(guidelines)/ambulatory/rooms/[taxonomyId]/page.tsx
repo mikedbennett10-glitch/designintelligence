@@ -232,8 +232,8 @@ export default async function RoomDataSheetPage({
           taxonomyId={taxonomyId}
         />
       )}
-      {activeProject && (
-        <div style={{ marginBottom: "1.5rem" }}>
+      <div style={{ marginBottom: "1.5rem", display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+        {activeProject && (
           <Link
             href={`/projects/${activeProject.id}/deviations/new?room=${taxonomyId}`}
             style={{
@@ -249,8 +249,23 @@ export default async function RoomDataSheetPage({
           >
             Submit a deviation request for this room
           </Link>
-        </div>
-      )}
+        )}
+        <Link
+          href={`/deviations/suggest?room=${taxonomyId}`}
+          style={{
+            display: "inline-block",
+            padding: "0.45rem 0.85rem",
+            borderRadius: "6px",
+            border: "1px solid var(--border-strong)",
+            color: "var(--muted)",
+            fontSize: "0.82rem",
+            fontWeight: 600,
+            textDecoration: "none",
+          }}
+        >
+          Suggest a change to the current standard
+        </Link>
+      </div>
       <RoomDataSheet {...data} />
     </div>
   );

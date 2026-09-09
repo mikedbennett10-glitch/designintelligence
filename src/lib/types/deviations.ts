@@ -3,7 +3,7 @@ export type DeviationStatus = "pending" | "approved" | "approved_with_conditions
 export interface Deviation {
   id: number;
   reference_number: string | null;
-  project_id: number;
+  project_id: number | null;
   room_taxonomy_id: string;
   standard_element: string;
   edition_id: number;
@@ -25,5 +25,5 @@ export interface Deviation {
 /** A deviation joined with its room name and project number, for list/dashboard views. */
 export interface DeviationWithContext extends Deviation {
   room_name: string;
-  procore_project_number: string;
+  procore_project_number: string | null;
 }

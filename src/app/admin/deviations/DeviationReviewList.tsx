@@ -124,7 +124,8 @@ export default function DeviationReviewList({ deviations }: { deviations: Deviat
           <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
             <div>
               <div style={{ fontFamily: "monospace", fontSize: "0.75rem", color: "var(--muted)" }}>
-                {d.reference_number ?? `#${d.id}`} · {d.procore_project_number}
+                {d.reference_number ?? `#${d.id}`} ·{" "}
+                {d.procore_project_number ?? "General suggestion (no project)"}
               </div>
               <div style={{ fontWeight: 700, marginTop: "0.15rem" }}>{d.room_name}</div>
               <div style={{ fontSize: "0.8rem", color: "var(--muted)" }}>{d.standard_element}</div>

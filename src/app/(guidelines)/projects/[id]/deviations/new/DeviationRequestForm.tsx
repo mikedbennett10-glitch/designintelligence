@@ -31,12 +31,14 @@ export default function DeviationRequestForm({
   roomName,
   editionId,
   editionName,
+  submitLabel = "Submit deviation request",
 }: {
-  projectId: number;
+  projectId: number | null;
   roomTaxonomyId: string;
   roomName: string;
   editionId: number;
   editionName: string;
+  submitLabel?: string;
 }) {
   const [state, formAction] = useFormState(submitDeviation, initialState);
 
@@ -59,7 +61,7 @@ export default function DeviationRequestForm({
 
   return (
     <form action={formAction} style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
-      <input type="hidden" name="projectId" value={projectId} />
+      <input type="hidden" name="projectId" value={projectId ?? ""} />
       <input type="hidden" name="roomTaxonomyId" value={roomTaxonomyId} />
       <input type="hidden" name="editionId" value={editionId} />
 
@@ -121,7 +123,7 @@ export default function DeviationRequestForm({
           cursor: "pointer",
         }}
       >
-        Submit deviation request
+        {submitLabel}
       </button>
 
       {state && !state.ok && (

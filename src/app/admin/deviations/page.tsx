@@ -32,7 +32,7 @@ async function getDeviations(): Promise<DeviationWithContext[]> {
   return ((data ?? []) as unknown as Row[]).map((r) => ({
     ...(r as unknown as DeviationWithContext),
     room_name: r.room?.name ?? r.room_taxonomy_id,
-    procore_project_number: r.project?.procore_project_number ?? "",
+    procore_project_number: r.project?.procore_project_number ?? null,
   }));
 }
 
