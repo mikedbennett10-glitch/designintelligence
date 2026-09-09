@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
-import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 
 import "@/styles/globals.css";
 
-const sourceSans = Source_Sans_3({
+const plusJakartaSans = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-source-sans",
-  display: "swap",
-});
-
-const sourceSerif = Source_Serif_4({
-  subsets: ["latin"],
-  variable: "--font-source-serif",
+  variable: "--font-plus-jakarta",
   display: "swap",
 });
 
@@ -27,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sourceSans.variable} ${sourceSerif.variable}`}>
+    <html lang="en" className={plusJakartaSans.variable}>
       <body>{children}</body>
     </html>
   );
