@@ -2,6 +2,8 @@
 
 import { useState, useTransition } from "react";
 
+import type { GuidelineType } from "@/lib/types/rooms";
+
 import { lockToCurrentEdition } from "./actions";
 
 export default function LockEditionButton({
@@ -10,7 +12,7 @@ export default function LockEditionButton({
   isRelock,
 }: {
   projectId: number;
-  guidelineType: "AMBULATORY" | "ACUTE";
+  guidelineType: GuidelineType;
   isRelock: boolean;
 }) {
   const [isPending, startTransition] = useTransition();

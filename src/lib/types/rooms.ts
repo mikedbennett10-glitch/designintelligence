@@ -7,7 +7,7 @@
 // keep the derived/composed shapes below (RoomWithChangeFlag, RoomDrawingStatus)
 // here regardless, since they don't map to a single table.
 
-export type GuidelineType = "AMBULATORY" | "ACUTE";
+export type GuidelineType = "AMBULATORY" | "ACUTE" | "BUILDING_PERFORMANCE";
 export type Zone = "On-Stage" | "Off-Stage" | "On-Stage / Off-Stage";
 export type AxonType = 1 | 2 | 3;
 

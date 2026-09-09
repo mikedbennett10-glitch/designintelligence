@@ -38,6 +38,7 @@ const GUIDELINES_AND_STANDARDS: StaticNavItem[] = [
 
 const ABOUT_THIS_DOCUMENT: StaticNavItem[] = [
   { label: "Version History", href: "/version-history" },
+  { label: "Training & Certifications", href: "/certifications" },
 ];
 
 function groupRoomsBySection(rooms: SidebarRoomItem[]) {

@@ -15,10 +15,10 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         }}
       >
         <Link
-          href="/ambulatory"
+          href="/"
           style={{ fontSize: "0.8rem", color: "var(--muted)", textDecoration: "none" }}
         >
-          ← Guidelines
+          ← Home
         </Link>
         <span
           style={{

@@ -26,7 +26,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
       }}
     >
       <Link
-        href="/ambulatory"
+        href="/"
         style={{
           display: "flex",
           alignItems: "baseline",
@@ -54,6 +54,12 @@ export default function Header({ user }: { user: HeaderUser | null }) {
 
         {user ? (
           <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+            <Link
+              href="/"
+              style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--csh-blue-dk)" }}
+            >
+              Home
+            </Link>
             <Link
               href="/projects"
               style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--csh-blue-dk)" }}
