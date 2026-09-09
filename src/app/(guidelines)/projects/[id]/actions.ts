@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
+import type { GuidelineType } from "@/lib/types/rooms";
 
 export interface LockResult {
   ok: boolean;
@@ -25,7 +26,7 @@ export interface LockResult {
  */
 export async function lockToCurrentEdition(
   projectId: number,
-  guidelineType: "AMBULATORY" | "ACUTE"
+  guidelineType: GuidelineType
 ): Promise<LockResult> {
   const admin = await requireAdmin();
   if (!admin) {
