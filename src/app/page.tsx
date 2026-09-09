@@ -100,16 +100,13 @@ export default async function HomePage() {
                 <Link
                   key={project.id}
                   href={`/projects/${project.id}`}
+                  className="tile-card"
                   style={{
                     display: "flex",
                     justifyContent: "space-between",
                     alignItems: "center",
                     padding: "0.85rem 1.1rem",
-                    border: "1px solid var(--border)",
                     borderRadius: "8px",
-                    background: "var(--surface)",
-                    textDecoration: "none",
-                    color: "var(--text)",
                   }}
                 >
                   <span style={{ fontFamily: "monospace", fontWeight: 600, fontSize: "0.88rem" }}>
@@ -137,12 +134,12 @@ export default async function HomePage() {
           >
             {GUIDELINE_MODES.map((mode) =>
               mode.comingSoon ? (
-                <div key={mode.href} className="mode-card mode-card--disabled">
+                <div key={mode.href} className="tile-card tile-card--disabled">
                   <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{mode.label}</div>
                   <div style={{ fontSize: "0.82rem" }}>Coming soon</div>
                 </div>
               ) : (
-                <Link key={mode.href} href={mode.href} className="mode-card">
+                <Link key={mode.href} href={mode.href} className="tile-card">
                   <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{mode.label}</div>
                   <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
                     {mode.description}
@@ -155,19 +152,7 @@ export default async function HomePage() {
 
         <section>
           <h2 style={{ fontSize: "1.1rem", marginBottom: "0.75rem" }}>Training</h2>
-          <Link
-            href="/certifications"
-            style={{
-              display: "block",
-              padding: "1.25rem",
-              border: "1px solid var(--border)",
-              borderRadius: "10px",
-              background: "var(--surface)",
-              textDecoration: "none",
-              color: "var(--text)",
-              maxWidth: "220px",
-            }}
-          >
+          <Link href="/certifications" className="tile-card" style={{ maxWidth: "220px" }}>
             <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>Certifications</div>
             <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
               Your required training modules and completion status.
