@@ -94,9 +94,17 @@ export default async function ProjectsPage() {
               }}
             >
               <div>
-                <div style={{ fontFamily: "monospace", fontWeight: 600, fontSize: "0.9rem" }}>
+                <Link
+                  href={`/projects/${project.id}`}
+                  style={{
+                    fontFamily: "monospace",
+                    fontWeight: 600,
+                    fontSize: "0.9rem",
+                    color: "var(--csh-blue-dk)",
+                  }}
+                >
                   {project.procore_project_number}
-                </div>
+                </Link>
                 <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: "0.2rem" }}>
                   {project.guideline_types.join(", ")}
                   {" · "}

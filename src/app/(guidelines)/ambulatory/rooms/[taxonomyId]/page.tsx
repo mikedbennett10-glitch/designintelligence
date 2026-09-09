@@ -1,5 +1,9 @@
+import Link from "next/link";
+
 import RoomDataSheet from "@/components/guidelines/RoomDataSheet";
+import RoomLockContextBanner from "@/components/guidelines/RoomLockContextBanner";
 import type { VersionHistoryEntry } from "@/components/guidelines/VersionHistory";
+import { getActiveProject } from "@/lib/projectContext";
 import { createClient } from "@/lib/supabase/server";
 import type {
   Room,
@@ -9,6 +13,7 @@ import type {
   RoomFinishWithDetail,
   RoomFurnitureWithDetail,
   RoomIntentionalOmission,
+  RoomPendingChange,
 } from "@/lib/types/rooms";
 
 interface RoomPageData {
@@ -21,9 +26,14 @@ interface RoomPageData {
   furniture: RoomFurnitureWithDetail[];
   drawings: RoomDrawing[];
   versionHistory: VersionHistoryEntry[];
+  lockContext: {
+    projectNumber: string;
+    lockedEditionName: string;
+    changes: RoomPendingChange[];
+  } | null;
 }
 
-async function getRoomPageData(taxonomyId: string): Promise<RoomPageData | null> {
+async function getRoomPageData(taxonomyId: string, compareLive: boolean): Promise<RoomPageData | null> {
   const supabase = await createClient();
 
   const { data: room, error: roomError } = await supabase
@@ -33,7 +43,42 @@ async function getRoomPageData(taxonomyId: string): Promise<RoomPageData | null>
     .single();
 
   if (roomError || !room) return null;
-  const typedRoom = room as Room;
+  const liveRoom = room as Room;
+
+  // WBS 6.4.1: while in Project mode with a locked edition, a room data
+  // sheet shows that edition's content, not the live row — unless the
+  // viewer explicitly asked to compare against the current guideline.
+  const activeProject = compareLive ? null : await getActiveProject();
+  let resolvedRoom = liveRoom;
+  let lockContext: RoomPageData["lockContext"] = null;
+
+  if (activeProject?.edition_lock_id) {
+    // Cast away the generated Database type's empty Functions map — it's
+    // a placeholder until `supabase gen types` is run against a real
+    // project; room_as_of_edition is a real SQL function (see the
+    // edition-locked-fidelity migration).
+    const rpc = supabase.rpc as unknown as (
+      fn: string,
+      args: Record<string, unknown>
+    ) => Promise<{ data: unknown }>;
+    const { data: snapshot } = await rpc("room_as_of_edition", {
+      p_room_taxonomy_id: taxonomyId,
+      p_edition_id: activeProject.edition_lock_id,
+    });
+    if (snapshot) resolvedRoom = snapshot as unknown as Room;
+
+    const { data: pending } = await supabase
+      .from("room_pending_changes")
+      .select("*")
+      .eq("room_taxonomy_id", taxonomyId)
+      .gt("changed_in_edition_date", activeProject.locked_edition_date ?? "1900-01-01");
+
+    lockContext = {
+      projectNumber: activeProject.procore_project_number,
+      lockedEditionName: activeProject.locked_edition_name ?? "the locked edition",
+      changes: (pending ?? []) as unknown as RoomPendingChange[],
+    };
+  }
 
   const [
     { data: edition },
@@ -48,7 +93,7 @@ async function getRoomPageData(taxonomyId: string): Promise<RoomPageData | null>
     supabase
       .from("editions")
       .select("name")
-      .eq("id", typedRoom.edition_id)
+      .eq("id", resolvedRoom.edition_id)
       .single() as unknown as Promise<{ data: { name: string } | null }>,
     supabase
       .from("room_decision_logic")
@@ -95,7 +140,7 @@ async function getRoomPageData(taxonomyId: string): Promise<RoomPageData | null>
   }));
 
   return {
-    room: typedRoom,
+    room: resolvedRoom,
     editionName: edition?.name ?? "Unknown edition",
     decisionLogic: (decisionLogic ?? []) as RoomDecisionLogicItem[],
     omissions: (omissions ?? []) as RoomIntentionalOmission[],
@@ -104,21 +149,25 @@ async function getRoomPageData(taxonomyId: string): Promise<RoomPageData | null>
     furniture: (furniture ?? []) as unknown as RoomFurnitureWithDetail[],
     drawings: (drawings ?? []) as RoomDrawing[],
     versionHistory,
+    lockContext,
   };
 }
 
 export default async function RoomDataSheetPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ taxonomyId: string }>;
+  searchParams: Promise<{ compareLive?: string }>;
 }) {
   const { taxonomyId } = await params;
+  const { compareLive } = await searchParams;
 
   let data: RoomPageData | null = null;
   let loadError: string | null = null;
 
   try {
-    data = await getRoomPageData(taxonomyId);
+    data = await getRoomPageData(taxonomyId, compareLive === "1");
   } catch (err) {
     loadError = err instanceof Error ? err.message : "Unable to load this room.";
   }
@@ -150,5 +199,34 @@ export default async function RoomDataSheetPage({
     );
   }
 
-  return <RoomDataSheet {...data} />;
+  return (
+    <div>
+      {compareLive === "1" && (
+        <div
+          style={{
+            marginBottom: "1.5rem",
+            padding: "0.6rem 1rem",
+            background: "var(--csh-charcoal-lt)",
+            border: "1px solid var(--border-strong)",
+            borderRadius: "6px",
+            fontSize: "0.82rem",
+          }}
+        >
+          Viewing the current guideline, not your project&apos;s locked edition.{" "}
+          <Link href={`/ambulatory/rooms/${taxonomyId}`} style={{ fontWeight: 600, color: "var(--csh-blue-dk)" }}>
+            Back to locked view →
+          </Link>
+        </div>
+      )}
+      {data.lockContext && (
+        <RoomLockContextBanner
+          projectNumber={data.lockContext.projectNumber}
+          lockedEditionName={data.lockContext.lockedEditionName}
+          changes={data.lockContext.changes}
+          taxonomyId={taxonomyId}
+        />
+      )}
+      <RoomDataSheet {...data} />
+    </div>
+  );
 }
