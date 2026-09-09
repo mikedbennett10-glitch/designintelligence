@@ -1,5 +1,6 @@
-import Header, { type HeaderUser } from "@/components/layout/Header";
+import Header from "@/components/layout/Header";
 import Sidebar, { type SidebarRoomItem } from "@/components/layout/Sidebar";
+import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
 async function getSidebarRooms(): Promise<SidebarRoomItem[]> {
@@ -20,29 +21,6 @@ async function getSidebarRooms(): Promise<SidebarRoomItem[]> {
     return (data ?? []) as SidebarRoomItem[];
   } catch {
     return [];
-  }
-}
-
-async function getCurrentUser(): Promise<HeaderUser | null> {
-  try {
-    const supabase = await createClient();
-    const {
-      data: { user: authUser },
-    } = await supabase.auth.getUser();
-    if (!authUser?.email) return null;
-
-    const { data: profile } = await supabase
-      .from("users")
-      .select("email, display_name, tier")
-      .eq("email", authUser.email)
-      .single();
-
-    const row = profile as { email: string; display_name: string; tier: string } | null;
-    if (!row) return null;
-
-    return { email: row.email, displayName: row.display_name, tier: row.tier };
-  } catch {
-    return null;
   }
 }
 
