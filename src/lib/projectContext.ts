@@ -20,19 +20,20 @@ export async function getActiveProject(): Promise<ProjectWithEdition | null> {
     const supabase = await createClient();
     const { data: project } = await supabase
       .from("projects")
-      .select("*, locked_edition:editions(name)")
+      .select("*, locked_edition:editions(name, edition_date)")
       .eq("id", Number(projectId))
       .single();
 
     if (!project) return null;
 
     const row = project as unknown as Record<string, unknown> & {
-      locked_edition: { name: string } | null;
+      locked_edition: { name: string; edition_date: string } | null;
     };
 
     return {
       ...(row as unknown as ProjectWithEdition),
       locked_edition_name: row.locked_edition?.name ?? null,
+      locked_edition_date: row.locked_edition?.edition_date ?? null,
     };
   } catch {
     return null;

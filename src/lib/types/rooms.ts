@@ -217,6 +217,18 @@ export interface EditionChangeWithRoom extends EditionChangeItem {
   room_name: string | null;
 }
 
+/** A row from the room_pending_changes view: a material room change on record, with its diff. */
+export interface RoomPendingChange {
+  room_taxonomy_id: string;
+  room_name: string;
+  changed_in_edition_id: number;
+  changed_in_edition_name: string;
+  changed_in_edition_date: string;
+  change_summary: string | null;
+  changed_fields: string[] | null;
+  created_at: string;
+}
+
 /** A room_finishes row joined with its finishes record. */
 export interface RoomFinishWithDetail extends RoomFinish {
   finish: Pick<

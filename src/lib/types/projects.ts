@@ -15,4 +15,5 @@ export interface Project {
 /** A project plus its locked edition's display name, for the project-mode banner and list. */
 export interface ProjectWithEdition extends Project {
   locked_edition_name: string | null;
+  locked_edition_date: string | null;
 }
