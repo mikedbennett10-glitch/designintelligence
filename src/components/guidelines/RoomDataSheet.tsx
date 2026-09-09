@@ -90,7 +90,7 @@ export default function RoomDataSheet({
   return (
     <div>
       <header style={{ marginBottom: "1.5rem" }}>
-        <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "1rem" }}>
           <div>
             <div
               style={{
@@ -108,7 +108,15 @@ export default function RoomDataSheet({
             )}
           </div>
           {actions && (
-            <div style={{ flexShrink: 0, display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+            <div
+              style={{
+                flexShrink: 0,
+                display: "flex",
+                alignItems: "flex-start",
+                gap: "0.75rem",
+                flexWrap: "wrap",
+              }}
+            >
               {actions}
             </div>
           )}
