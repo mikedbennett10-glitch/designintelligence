@@ -71,6 +71,7 @@ export default function RoomDataSheet({
   furniture,
   drawings,
   versionHistory,
+  actions,
 }: {
   room: Room;
   editionName: string;
@@ -81,6 +82,7 @@ export default function RoomDataSheet({
   furniture: RoomFurnitureWithDetail[];
   drawings: RoomDrawing[];
   versionHistory: VersionHistoryEntry[];
+  actions?: React.ReactNode;
 }) {
   const [tab, setTab] = useState<Tab>("Overview");
   const mepEntries = MEP_FIELDS.filter(({ key }) => Boolean(room[key]));
@@ -88,20 +90,29 @@ export default function RoomDataSheet({
   return (
     <div>
       <header style={{ marginBottom: "1.5rem" }}>
-        <div
-          style={{
-            fontFamily: "monospace",
-            fontSize: "0.8rem",
-            color: "var(--muted)",
-            marginBottom: "0.35rem",
-          }}
-        >
-          {room.taxonomy_id}
+        <div style={{ display: "flex", justifyContent: "space-between", gap: "1rem" }}>
+          <div>
+            <div
+              style={{
+                fontFamily: "monospace",
+                fontSize: "0.8rem",
+                color: "var(--muted)",
+                marginBottom: "0.35rem",
+              }}
+            >
+              {room.taxonomy_id}
+            </div>
+            <h1 style={{ fontSize: "1.75rem", marginBottom: "0.25rem" }}>{room.name}</h1>
+            {room.subtitle && (
+              <p style={{ margin: "0 0 0.75rem", color: "var(--muted)" }}>{room.subtitle}</p>
+            )}
+          </div>
+          {actions && (
+            <div style={{ flexShrink: 0, display: "flex", gap: "0.75rem", flexWrap: "wrap" }}>
+              {actions}
+            </div>
+          )}
         </div>
-        <h1 style={{ fontSize: "1.75rem", marginBottom: "0.25rem" }}>{room.name}</h1>
-        {room.subtitle && (
-          <p style={{ margin: "0 0 0.75rem", color: "var(--muted)" }}>{room.subtitle}</p>
-        )}
         <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", alignItems: "center" }}>
           <Badge tone="blue">{room.zone}</Badge>
           <Badge tone="neutral">{room.section}</Badge>
