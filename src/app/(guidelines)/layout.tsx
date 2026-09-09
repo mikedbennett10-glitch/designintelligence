@@ -1,6 +1,8 @@
 import Header from "@/components/layout/Header";
+import ProjectContextBar from "@/components/layout/ProjectContextBar";
 import Sidebar, { type SidebarRoomItem } from "@/components/layout/Sidebar";
 import { getCurrentUser } from "@/lib/auth";
+import { getActiveProject } from "@/lib/projectContext";
 import { createClient } from "@/lib/supabase/server";
 
 async function getSidebarRooms(): Promise<SidebarRoomItem[]> {
@@ -29,11 +31,16 @@ export default async function GuidelinesLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const [rooms, user] = await Promise.all([getSidebarRooms(), getCurrentUser()]);
+  const [rooms, user, activeProject] = await Promise.all([
+    getSidebarRooms(),
+    getCurrentUser(),
+    getActiveProject(),
+  ]);
 
   return (
     <div>
       <Header user={user} />
+      {activeProject && <ProjectContextBar project={activeProject} />}
       <div style={{ display: "flex" }}>
         <Sidebar rooms={rooms} />
         <main style={{ flex: 1, minWidth: 0, padding: "2rem" }}>
