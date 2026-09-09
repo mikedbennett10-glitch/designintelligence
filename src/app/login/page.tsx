@@ -9,6 +9,25 @@ export default function LoginPage() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const [pwEmail, setPwEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [pwStatus, setPwStatus] = useState<"idle" | "sending" | "error">("idle");
+  const [pwErrorMessage, setPwErrorMessage] = useState<string | null>(null);
+
+  async function signInWithPassword(e: React.FormEvent) {
+    e.preventDefault();
+    setPwStatus("sending");
+    setPwErrorMessage(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.signInWithPassword({ email: pwEmail, password });
+    if (error) {
+      setPwStatus("error");
+      setPwErrorMessage(error.message);
+      return;
+    }
+    window.location.href = "/";
+  }
+
   async function signInWithGoogle() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
@@ -151,6 +170,79 @@ export default function LoginPage() {
             )}
           </form>
         )}
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: "0.75rem",
+            margin: "1rem 0",
+            fontSize: "0.75rem",
+            color: "var(--hint)",
+          }}
+        >
+          <span style={{ flex: 1, borderTop: "1px solid var(--border)" }} />
+          or with a password
+          <span style={{ flex: 1, borderTop: "1px solid var(--border)" }} />
+        </div>
+
+        <form onSubmit={signInWithPassword}>
+          <input
+            type="email"
+            required
+            placeholder="you@yourfirm.com"
+            value={pwEmail}
+            onChange={(e) => setPwEmail(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.6rem 0.75rem",
+              borderRadius: "6px",
+              border: "1px solid var(--border-strong)",
+              fontSize: "0.9rem",
+              marginBottom: "0.5rem",
+              boxSizing: "border-box",
+            }}
+          />
+          <input
+            type="password"
+            required
+            placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            style={{
+              width: "100%",
+              padding: "0.6rem 0.75rem",
+              borderRadius: "6px",
+              border: "1px solid var(--border-strong)",
+              fontSize: "0.9rem",
+              marginBottom: "0.75rem",
+              boxSizing: "border-box",
+            }}
+          />
+          <button
+            type="submit"
+            disabled={pwStatus === "sending"}
+            style={{
+              width: "100%",
+              padding: "0.6rem 1rem",
+              borderRadius: "6px",
+              border: "1px solid var(--border-strong)",
+              background: "var(--surface)",
+              color: "var(--text)",
+              fontSize: "0.9rem",
+              fontWeight: 600,
+              cursor: pwStatus === "sending" ? "default" : "pointer",
+              opacity: pwStatus === "sending" ? 0.7 : 1,
+            }}
+          >
+            {pwStatus === "sending" ? "Signing in…" : "Sign in with password"}
+          </button>
+          {pwStatus === "error" && (
+            <p style={{ marginTop: "0.6rem", fontSize: "0.8rem", color: "var(--csh-pink)" }}>
+              {pwErrorMessage}
+            </p>
+          )}
+        </form>
       </div>
     </div>
   );
