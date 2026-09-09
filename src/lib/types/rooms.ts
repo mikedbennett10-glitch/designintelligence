@@ -212,6 +212,11 @@ export interface EditionChangeItem {
   created_at: string;
 }
 
+/** An edition_changes row with its affected room's display name, for the top-level Version History page. */
+export interface EditionChangeWithRoom extends EditionChangeItem {
+  room_name: string | null;
+}
+
 /** A room_finishes row joined with its finishes record. */
 export interface RoomFinishWithDetail extends RoomFinish {
   finish: Pick<
