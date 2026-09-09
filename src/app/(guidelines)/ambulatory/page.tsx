@@ -149,15 +149,8 @@ function RoomCard({ room }: { room: RoomCardData }) {
   return (
     <Link
       href={`/ambulatory/rooms/${room.taxonomy_id}`}
-      style={{
-        display: "block",
-        padding: "1rem",
-        background: "var(--surface)",
-        border: "1px solid var(--border)",
-        borderRadius: "8px",
-        textDecoration: "none",
-        color: "var(--text)",
-      }}
+      className="tile-card"
+      style={{ padding: "1rem", borderRadius: "8px" }}
     >
       <div
         style={{
