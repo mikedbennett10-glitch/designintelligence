@@ -1,8 +1,15 @@
+import Link from "next/link";
+
 import type {
   RoomEquipmentWithDetail,
   RoomFinishWithDetail,
   RoomFurnitureWithDetail,
 } from "@/lib/types/rooms";
+
+const repoLinkStyle: React.CSSProperties = {
+  color: "var(--csh-blue-dk)",
+  fontWeight: 600,
+};
 
 const th: React.CSSProperties = {
   textAlign: "left",
@@ -91,7 +98,11 @@ export default function SpecPanel({
             finishes.map((rf) => (
               <tr key={rf.id}>
                 <td style={td}>{rf.location}</td>
-                <td style={{ ...td, fontFamily: "monospace" }}>{rf.finish_code}</td>
+                <td style={{ ...td, fontFamily: "monospace" }}>
+                  <Link href={`/finishes?q=${rf.finish_code}`} style={repoLinkStyle}>
+                    {rf.finish_code}
+                  </Link>
+                </td>
                 <td style={td}>
                   {rf.finish
                     ? [rf.finish.product_type, rf.finish.product_name, rf.finish.color]
@@ -122,7 +133,15 @@ export default function SpecPanel({
             equipment.map((re) => (
               <tr key={re.id}>
                 <td style={td}>{re.quantity}</td>
-                <td style={td}>{re.equipment?.name ?? re.equipment_id}</td>
+                <td style={td}>
+                  {re.equipment ? (
+                    <Link href={`/equipment?q=${re.equipment.taxonomy_id}`} style={repoLinkStyle}>
+                      {re.equipment.name}
+                    </Link>
+                  ) : (
+                    re.equipment_id
+                  )}
+                </td>
                 <td style={{ ...td, color: "var(--muted)" }}>
                   {re.equipment?.responsibility ?? ""}
                 </td>
@@ -149,7 +168,15 @@ export default function SpecPanel({
             furniture.map((rf) => (
               <tr key={rf.id}>
                 <td style={td}>{rf.quantity}</td>
-                <td style={td}>{rf.furniture?.name ?? rf.furniture_id}</td>
+                <td style={td}>
+                  {rf.furniture ? (
+                    <Link href={`/furniture?q=${rf.furniture.taxonomy_id}`} style={repoLinkStyle}>
+                      {rf.furniture.name}
+                    </Link>
+                  ) : (
+                    rf.furniture_id
+                  )}
+                </td>
                 <td style={{ ...td, color: "var(--muted)" }}>
                   {rf.furniture?.responsibility ?? ""}
                 </td>

@@ -31,8 +31,9 @@ const PROTOTYPE_PLANS: StaticNavItem[] = [
 ];
 
 const GUIDELINES_AND_STANDARDS: StaticNavItem[] = [
-  { label: "Finish Schedule" },
-  { label: "Equipment Schedule" },
+  { label: "Finish Schedule", href: "/finishes" },
+  { label: "Equipment Schedule", href: "/equipment" },
+  { label: "Furniture / FF&E Schedule", href: "/furniture" },
 ];
 
 const ABOUT_THIS_DOCUMENT: StaticNavItem[] = [{ label: "Version History" }];
@@ -126,6 +127,7 @@ export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
 }
 
 function StaticGroup({ title, items }: { title: string; items: StaticNavItem[] }) {
+  const pathname = usePathname();
   return (
     <div style={{ marginBottom: "1.5rem" }}>
       <div
@@ -151,7 +153,13 @@ function StaticGroup({ title, items }: { title: string; items: StaticNavItem[] }
                   display: "block",
                   padding: "0.4rem 1.25rem",
                   fontSize: "0.875rem",
-                  color: "var(--text)",
+                  color: pathname === item.href ? "var(--csh-blue-dk)" : "var(--text)",
+                  background: pathname === item.href ? "var(--csh-blue-lt)" : "transparent",
+                  borderLeft:
+                    pathname === item.href
+                      ? "3px solid var(--csh-blue)"
+                      : "3px solid transparent",
+                  textDecoration: "none",
                 }}
               >
                 {item.label}

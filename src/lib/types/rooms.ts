@@ -261,3 +261,21 @@ export interface RoomWithChangeFlag extends Room {
   latest_change_summary: string | null;
   latest_changed_fields: string[] | null;
 }
+
+/** A room that references a given repository item (finish/equipment/furniture), for reverse lookup. */
+export interface RoomUsageRef {
+  taxonomy_id: string;
+  name: string;
+}
+
+export interface FinishWithUsage extends Finish {
+  usedInRooms: RoomUsageRef[];
+}
+
+export interface EquipmentWithUsage extends Equipment {
+  usedInRooms: RoomUsageRef[];
+}
+
+export interface FurnitureWithUsage extends Furniture {
+  usedInRooms: RoomUsageRef[];
+}
