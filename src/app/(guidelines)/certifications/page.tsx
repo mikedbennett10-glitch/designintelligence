@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -149,21 +151,30 @@ export default async function CertificationsPage() {
                     </div>
                   )}
                 </div>
-                <span
-                  style={{
-                    flexShrink: 0,
-                    fontSize: "0.7rem",
-                    fontWeight: 700,
-                    padding: "0.2rem 0.6rem",
-                    borderRadius: "999px",
-                    background: done ? "var(--csh-blue-lt)" : "var(--csh-charcoal-lt)",
-                    color: done ? "var(--csh-blue-dk)" : "var(--muted)",
-                  }}
-                >
-                  {done
-                    ? `Completed ${new Date(row.completion!.completed_at).toLocaleDateString()}`
-                    : "Not completed"}
-                </span>
+                <div style={{ flexShrink: 0, display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                  <span
+                    style={{
+                      fontSize: "0.7rem",
+                      fontWeight: 700,
+                      padding: "0.2rem 0.6rem",
+                      borderRadius: "999px",
+                      background: done ? "var(--csh-blue-lt)" : "var(--csh-charcoal-lt)",
+                      color: done ? "var(--csh-blue-dk)" : "var(--muted)",
+                    }}
+                  >
+                    {done
+                      ? `Completed ${new Date(row.completion!.completed_at).toLocaleDateString()} (${row.completion!.score}%)`
+                      : row.completion
+                        ? `Failed (${row.completion.score}%)`
+                        : "Not completed"}
+                  </span>
+                  <Link
+                    href={`/certifications/${row.module_id}`}
+                    style={{ fontSize: "0.8rem", fontWeight: 600, color: "var(--csh-blue-dk)" }}
+                  >
+                    {done ? "Retake" : row.completion ? "Try again" : "Start"}
+                  </Link>
+                </div>
               </div>
             );
           })}
