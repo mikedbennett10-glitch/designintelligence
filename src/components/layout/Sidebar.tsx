@@ -34,6 +34,7 @@ const GUIDELINES_AND_STANDARDS: StaticNavItem[] = [
   { label: "Finish Schedule", href: "/finishes" },
   { label: "Equipment Schedule", href: "/equipment" },
   { label: "Furniture / FF&E Schedule", href: "/furniture" },
+  { label: "Code Reference", href: "/code-reference" },
 ];
 
 const ABOUT_THIS_DOCUMENT: StaticNavItem[] = [
