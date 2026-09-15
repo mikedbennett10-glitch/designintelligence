@@ -3,8 +3,16 @@
 import { revalidatePath } from "next/cache";
 
 import { getCurrentUser, requireAdmin } from "@/lib/auth";
+import { enqueueDeviationDecisionNotification } from "@/lib/notifications";
 import { createClient } from "@/lib/supabase/server";
 import type { DeviationStatus } from "@/lib/types/deviations";
+
+const STATUS_LABELS: Record<DeviationStatus, string> = {
+  pending: "Pending",
+  approved: "Approved",
+  approved_with_conditions: "Approved with conditions",
+  denied: "Denied",
+};
 
 export interface DecideResult {
   ok: boolean;
@@ -55,6 +63,52 @@ export async function decideDeviation(
 
   if (error) {
     return { ok: false, message: `Couldn't save the decision: ${error.message}` };
+  }
+
+  // Notify the requester of the outcome. Fetch the fields needed to
+  // compose the message; if this lookup fails, the decision itself is
+  // still saved — a missing notification isn't worth failing the whole
+  // action over.
+  try {
+    const deviationTable = supabase.from("deviations") as unknown as {
+      select: (cols: string) => {
+        eq: (col: string, val: unknown) => {
+          single: () => Promise<{
+            data: {
+              reference_number: string | null;
+              submitted_by: string;
+              standard_element: string;
+              room_taxonomy_id: string;
+            } | null;
+          }>;
+        };
+      };
+    };
+    const { data: deviation } = await deviationTable
+      .select("reference_number, submitted_by, standard_element, room_taxonomy_id")
+      .eq("id", deviationId)
+      .single();
+
+    if (deviation) {
+      const ref = deviation.reference_number ?? `#${deviationId}`;
+      await enqueueDeviationDecisionNotification({
+        deviationId,
+        recipientEmail: deviation.submitted_by,
+        subject: `Deviation ${ref} — ${STATUS_LABELS[status]}`,
+        body: [
+          `Your deviation request ${ref} regarding "${deviation.standard_element}" on ${deviation.room_taxonomy_id} has been decided.`,
+          "",
+          `Decision: ${STATUS_LABELS[status]}`,
+          "",
+          decisionText.trim(),
+          status === "approved_with_conditions" && conditions.trim() ? `\nConditions: ${conditions.trim()}` : "",
+        ]
+          .filter(Boolean)
+          .join("\n"),
+      });
+    }
+  } catch {
+    // Fail soft — see comment above.
   }
 
   revalidatePath("/admin/deviations");

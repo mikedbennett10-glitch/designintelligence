@@ -84,6 +84,14 @@ export default function Header({ user }: { user: HeaderUser | null }) {
             )}
             {user.tier === "administrative" && (
               <Link
+                href="/admin/notifications"
+                style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--brand-blue-dk)" }}
+              >
+                Notifications
+              </Link>
+            )}
+            {user.tier === "administrative" && (
+              <Link
                 href="/admin/code-reference"
                 style={{ fontSize: "0.75rem", fontWeight: 600, color: "var(--brand-blue-dk)" }}
               >
