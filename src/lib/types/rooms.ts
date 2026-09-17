@@ -86,6 +86,7 @@ export interface Finish {
   regional_variants: Record<string, unknown> | null;
   swatch_gcs_path: string | null;
   room_applications: string[] | null;
+  product_url: string | null;
   is_active: boolean;
   edition_id: number | null;
   created_at: string;
@@ -104,6 +105,8 @@ export interface Equipment {
   dimensions: string | null;
   power_requirements: string | null;
   notes: string | null;
+  product_url: string | null;
+  revit_model_url: string | null;
   is_active: boolean;
   edition_id: number | null;
   created_at: string;
@@ -122,6 +125,8 @@ export interface Furniture {
   upholstery_spec: string | null;
   responsibility: "OFOI" | "OFCI";
   notes: string | null;
+  product_url: string | null;
+  revit_model_url: string | null;
   is_active: boolean;
   edition_id: number | null;
   created_at: string;

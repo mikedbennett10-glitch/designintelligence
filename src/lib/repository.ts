@@ -100,3 +100,72 @@ export async function getFurnitureWithUsage(): Promise<FurnitureWithUsage[]> {
     junctionRows
   ) as unknown as Promise<FurnitureWithUsage[]>;
 }
+
+export async function getFinishByCode(code: string): Promise<FinishWithUsage | null> {
+  const supabase = await createClient();
+
+  const [{ data: finish }, { data: links }] = await Promise.all([
+    supabase.from("finishes").select("*").eq("code", code).maybeSingle(),
+    supabase
+      .from("room_finishes")
+      .select("finish_code, room:rooms(taxonomy_id, name)")
+      .eq("finish_code", code),
+  ]);
+
+  if (!finish) return null;
+
+  type LinkRow = { finish_code: string; room: { taxonomy_id: string; name: string } | null };
+  const usedInRooms: RoomUsageRef[] = ((links ?? []) as unknown as LinkRow[])
+    .filter((l) => l.room)
+    .map((l) => ({ taxonomy_id: l.room!.taxonomy_id, name: l.room!.name }));
+
+  return { ...(finish as unknown as FinishWithUsage), usedInRooms };
+}
+
+export async function getEquipmentByTaxonomyId(taxonomyId: string): Promise<EquipmentWithUsage | null> {
+  const supabase = await createClient();
+
+  const { data: equipment } = await supabase
+    .from("equipment")
+    .select("*")
+    .eq("taxonomy_id", taxonomyId)
+    .maybeSingle();
+
+  if (!equipment) return null;
+
+  const { data: links } = await supabase
+    .from("room_equipment")
+    .select("equipment_id, room:rooms(taxonomy_id, name)")
+    .eq("equipment_id", (equipment as unknown as { id: number }).id);
+
+  type LinkRow = { equipment_id: number; room: { taxonomy_id: string; name: string } | null };
+  const usedInRooms: RoomUsageRef[] = ((links ?? []) as unknown as LinkRow[])
+    .filter((l) => l.room)
+    .map((l) => ({ taxonomy_id: l.room!.taxonomy_id, name: l.room!.name }));
+
+  return { ...(equipment as unknown as EquipmentWithUsage), usedInRooms };
+}
+
+export async function getFurnitureByTaxonomyId(taxonomyId: string): Promise<FurnitureWithUsage | null> {
+  const supabase = await createClient();
+
+  const { data: furniture } = await supabase
+    .from("furniture")
+    .select("*")
+    .eq("taxonomy_id", taxonomyId)
+    .maybeSingle();
+
+  if (!furniture) return null;
+
+  const { data: links } = await supabase
+    .from("room_furniture")
+    .select("furniture_id, room:rooms(taxonomy_id, name)")
+    .eq("furniture_id", (furniture as unknown as { id: number }).id);
+
+  type LinkRow = { furniture_id: number; room: { taxonomy_id: string; name: string } | null };
+  const usedInRooms: RoomUsageRef[] = ((links ?? []) as unknown as LinkRow[])
+    .filter((l) => l.room)
+    .map((l) => ({ taxonomy_id: l.room!.taxonomy_id, name: l.room!.name }));
+
+  return { ...(furniture as unknown as FurnitureWithUsage), usedInRooms };
+}

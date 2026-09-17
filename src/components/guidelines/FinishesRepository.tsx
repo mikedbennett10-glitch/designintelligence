@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import type { FinishWithUsage } from "@/lib/types/rooms";
@@ -147,7 +148,11 @@ export default function FinishesRepository({
             ) : (
               filtered.map((f) => (
                 <tr key={f.code}>
-                  <td style={{ ...td, fontFamily: "monospace", fontWeight: 600 }}>{f.code}</td>
+                  <td style={{ ...td, fontFamily: "monospace", fontWeight: 600 }}>
+                    <Link href={`/finishes/${f.code}`} style={{ color: "var(--brand-blue-dk)" }}>
+                      {f.code}
+                    </Link>
+                  </td>
                   <td style={td}>{f.product_type}</td>
                   <td style={td}>
                     {[f.manufacturer, f.product_name].filter(Boolean).join(" — ") || "—"}

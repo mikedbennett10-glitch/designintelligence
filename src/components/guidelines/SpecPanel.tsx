@@ -99,7 +99,7 @@ export default function SpecPanel({
               <tr key={rf.id}>
                 <td style={td}>{rf.location}</td>
                 <td style={{ ...td, fontFamily: "monospace" }}>
-                  <Link href={`/finishes?q=${rf.finish_code}`} style={repoLinkStyle}>
+                  <Link href={`/finishes/${rf.finish_code}`} style={repoLinkStyle}>
                     {rf.finish_code}
                   </Link>
                 </td>
@@ -135,7 +135,7 @@ export default function SpecPanel({
                 <td style={td}>{re.quantity}</td>
                 <td style={td}>
                   {re.equipment ? (
-                    <Link href={`/equipment?q=${re.equipment.taxonomy_id}`} style={repoLinkStyle}>
+                    <Link href={`/equipment/${re.equipment.taxonomy_id}`} style={repoLinkStyle}>
                       {re.equipment.name}
                     </Link>
                   ) : (
@@ -170,7 +170,7 @@ export default function SpecPanel({
                 <td style={td}>{rf.quantity}</td>
                 <td style={td}>
                   {rf.furniture ? (
-                    <Link href={`/furniture?q=${rf.furniture.taxonomy_id}`} style={repoLinkStyle}>
+                    <Link href={`/furniture/${rf.furniture.taxonomy_id}`} style={repoLinkStyle}>
                       {rf.furniture.name}
                     </Link>
                   ) : (

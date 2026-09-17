@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import type { FurnitureWithUsage } from "@/lib/types/rooms";
@@ -110,8 +111,16 @@ export default function FurnitureRepository({
             ) : (
               filtered.map((f) => (
                 <tr key={f.id}>
-                  <td style={{ ...td, fontFamily: "monospace", fontSize: "0.78rem" }}>{f.taxonomy_id}</td>
-                  <td style={{ ...td, fontWeight: 600 }}>{f.name}</td>
+                  <td style={{ ...td, fontFamily: "monospace", fontSize: "0.78rem" }}>
+                    <Link href={`/furniture/${f.taxonomy_id}`} style={{ color: "var(--brand-blue-dk)" }}>
+                      {f.taxonomy_id}
+                    </Link>
+                  </td>
+                  <td style={{ ...td, fontWeight: 600 }}>
+                    <Link href={`/furniture/${f.taxonomy_id}`} style={{ color: "inherit" }}>
+                      {f.name}
+                    </Link>
+                  </td>
                   <td style={{ ...td, color: "var(--muted)" }}>
                     {[f.manufacturer, f.model].filter(Boolean).join(" — ") || "—"}
                   </td>

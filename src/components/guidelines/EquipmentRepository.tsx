@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import type { EquipmentWithUsage } from "@/lib/types/rooms";
@@ -148,8 +149,16 @@ export default function EquipmentRepository({
             ) : (
               filtered.map((e) => (
                 <tr key={e.id}>
-                  <td style={{ ...td, fontFamily: "monospace", fontSize: "0.78rem" }}>{e.taxonomy_id}</td>
-                  <td style={{ ...td, fontWeight: 600 }}>{e.name}</td>
+                  <td style={{ ...td, fontFamily: "monospace", fontSize: "0.78rem" }}>
+                    <Link href={`/equipment/${e.taxonomy_id}`} style={{ color: "var(--brand-blue-dk)" }}>
+                      {e.taxonomy_id}
+                    </Link>
+                  </td>
+                  <td style={{ ...td, fontWeight: 600 }}>
+                    <Link href={`/equipment/${e.taxonomy_id}`} style={{ color: "inherit" }}>
+                      {e.name}
+                    </Link>
+                  </td>
                   <td style={{ ...td, color: "var(--muted)" }}>
                     {[e.manufacturer, e.model].filter(Boolean).join(" — ") || "—"}
                   </td>
