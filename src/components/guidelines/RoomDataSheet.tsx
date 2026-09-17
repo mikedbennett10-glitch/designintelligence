@@ -17,7 +17,7 @@ import type {
   RoomIntentionalOmission,
 } from "@/lib/types/rooms";
 
-const TABS = ["Overview", "Decision Logic", "Specification", "Drawings", "Version History"] as const;
+const TABS = ["Overview", "Decision Logic", "FFE", "Drawings", "Version History"] as const;
 type Tab = (typeof TABS)[number];
 
 const MEP_FIELDS: { key: keyof Room; label: string }[] = [
@@ -266,7 +266,7 @@ export default function RoomDataSheet({
         </div>
       )}
 
-      {tab === "Specification" && (
+      {tab === "FFE" && (
         <SpecPanel finishes={finishes} equipment={equipment} furniture={furniture} />
       )}
 
