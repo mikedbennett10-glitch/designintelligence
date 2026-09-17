@@ -1,6 +1,6 @@
 # Design Intelligence Platform (DIP)
 
-Interactive web-based reference platform for the health system's Design & Construction team
+Interactive web-based reference platform for internal Design & Construction teams —
 ambulatory and acute care facility design guidelines.
 
 ## Stack
@@ -10,7 +10,7 @@ ambulatory and acute care facility design guidelines.
 - **Database:** PostgreSQL via Supabase (Cloud SQL on GCP in production)
 - **Hosting:** Google Cloud Platform — Cloud Run, Cloud Storage, Cloud SQL, Artifact Registry
 - **CI/CD:** GitHub Actions → Artifact Registry → Cloud Run
-- **Auth:** Google Workspace SSO (internal the health system users) + magic-link email (external architects/contractors) via Supabase GoTrue
+- **Auth:** Google Workspace SSO (internal staff users) + magic-link email (external architects/contractors) via Supabase GoTrue
 
 ## Project structure
 

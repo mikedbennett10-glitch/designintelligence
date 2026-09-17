@@ -45,7 +45,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           Design Intelligence Platform
         </span>
         <span style={{ fontSize: "0.75rem", color: "var(--muted)" }}>
-          the health system's Design & Construction team
+          Design & Construction
         </span>
       </Link>
 

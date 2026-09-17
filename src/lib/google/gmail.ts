@@ -8,7 +8,7 @@ export interface SendEmailResult {
 /**
  * Sends via the Gmail API using a Google Cloud service account with
  * domain-wide delegation, impersonating a shared Workspace mailbox (the
- * "subject" on the JWT). This requires the health system IT to approve and
+ * "subject" on the JWT). This requires IT to approve and
  * configure domain-wide delegation for the service account in the
  * Workspace admin console — until that happens and the three env vars
  * below are set, this fails soft (returns ok: false with a clear reason)

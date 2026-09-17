@@ -12,7 +12,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 export const metadata: Metadata = {
   title: "Design Intelligence Platform",
   description:
-    "the health system's Design & Construction team — ambulatory and acute care facility design guidelines.",
+    "Ambulatory and acute care facility design guidelines for internal Design & Construction teams.",
 };
 
 export default function RootLayout({

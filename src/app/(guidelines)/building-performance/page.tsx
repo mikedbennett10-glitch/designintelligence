@@ -42,7 +42,7 @@ export default async function BuildingPerformanceOverviewPage() {
       <div style={{ marginBottom: "2rem" }}>
         <h1 style={{ fontSize: "1.75rem" }}>Building Performance Guidelines</h1>
         <p style={{ color: "var(--muted)", maxWidth: "60ch" }}>
-          Envelope, systems, and sustainability standards for the health system facilities.
+          Envelope, systems, and sustainability standards for our facilities.
         </p>
       </div>
 

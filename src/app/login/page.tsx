@@ -86,7 +86,7 @@ export default function LoginPage() {
           Design Intelligence Platform
         </div>
         <p style={{ margin: "0 0 1.75rem", fontSize: "0.85rem", color: "var(--muted)" }}>
-          the health system's Design & Construction team
+          Design & Construction
         </p>
 
         <button

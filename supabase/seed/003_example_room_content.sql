@@ -7,7 +7,7 @@
 -- room data sheet UI (description, MEP, Decision Logic, Specification,
 -- Version History tabs) has something real to render instead of empty
 -- states across the board, while the actual guideline content — which
--- only the health system's Design & Architecture team has — is authored separately.
+-- only the Design & Architecture team has — is authored separately.
 --
 -- Populates 3 rooms spanning different sections and drawing-scope needs:
 --   AMB-ROOM-EX-001    Exam Room, Typical 2-Door   (primary room type)
@@ -133,7 +133,7 @@ BEGIN
   ON CONFLICT DO NOTHING;
 
   INSERT INTO room_intentional_omissions (room_taxonomy_id, item, rationale, edition_id, sort_order) VALUES
-    ('AMB-CLINIC-ARR-001', 'Enclosed reception windows', 'Example content. An open counter reads as more welcoming than a glazed partition, and our facilities are non-security-sensitive enough not to need the barrier.', v_edition_id, 10),
+    ('AMB-CLINIC-ARR-001', 'Enclosed reception windows', 'Example content. An open counter reads as more welcoming than a glazed partition, and these facilities are non-security-sensitive enough not to need the barrier.', v_edition_id, 10),
     ('AMB-CLINIC-ARR-001', 'Digital wayfinding displays', 'Example content. Evaluated and deferred — static signage was judged sufficient at typical clinic scale, and screens add a maintenance burden without a clear patient benefit at this scale.', v_edition_id, 20)
   ON CONFLICT DO NOTHING;
 

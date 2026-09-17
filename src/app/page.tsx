@@ -60,7 +60,7 @@ export default async function HomePage() {
           Welcome, {user.displayName}
         </h1>
         <p style={{ color: "var(--muted)", marginBottom: "2.5rem" }}>
-          the health system's Design & Construction team — Design Intelligence Platform.
+          Design & Construction — internal design standards platform.
         </p>
 
         <section style={{ marginBottom: "2.5rem" }}>
