@@ -122,7 +122,11 @@ export interface Furniture {
   subcategory: string | null;
   manufacturer: string | null;
   model: string | null;
+  dimensions: string | null;
+  weight_capacity: string | null;
+  frame_finish: string | null;
   upholstery_spec: string | null;
+  location: string | null;
   responsibility: "OFOI" | "OFCI";
   notes: string | null;
   product_url: string | null;

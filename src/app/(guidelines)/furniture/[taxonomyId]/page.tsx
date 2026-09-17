@@ -72,8 +72,12 @@ export default async function FurnitureDetailPage({
               { label: "Subcategory", value: furniture.subcategory },
               { label: "Manufacturer", value: furniture.manufacturer },
               { label: "Model", value: furniture.model },
-              { label: "Responsibility", value: furniture.responsibility },
+              { label: "Dimensions", value: furniture.dimensions },
+              { label: "Weight capacity", value: furniture.weight_capacity },
+              { label: "Frame finish", value: furniture.frame_finish },
               { label: "Upholstery spec", value: furniture.upholstery_spec },
+              { label: "Responsibility", value: furniture.responsibility },
+              { label: "Location", value: furniture.location },
               { label: "Notes", value: furniture.notes },
             ]}
           />
