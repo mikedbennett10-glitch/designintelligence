@@ -14,6 +14,10 @@ export default function LoginPage() {
   const [pwStatus, setPwStatus] = useState<"idle" | "sending" | "error">("idle");
   const [pwErrorMessage, setPwErrorMessage] = useState<string | null>(null);
 
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotStatus, setForgotStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [forgotErrorMessage, setForgotErrorMessage] = useState<string | null>(null);
+
   async function signInWithPassword(e: React.FormEvent) {
     e.preventDefault();
     setPwStatus("sending");
@@ -34,6 +38,22 @@ export default function LoginPage() {
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
+  }
+
+  async function sendPasswordReset(e: React.FormEvent) {
+    e.preventDefault();
+    setForgotStatus("sending");
+    setForgotErrorMessage(null);
+    const supabase = createClient();
+    const { error } = await supabase.auth.resetPasswordForEmail(pwEmail, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
+    });
+    if (error) {
+      setForgotStatus("error");
+      setForgotErrorMessage(error.message);
+    } else {
+      setForgotStatus("sent");
+    }
   }
 
   async function sendMagicLink(e: React.FormEvent) {
@@ -243,6 +263,63 @@ export default function LoginPage() {
             </p>
           )}
         </form>
+
+        {!forgotMode && forgotStatus !== "sent" && (
+          <button
+            type="button"
+            onClick={() => setForgotMode(true)}
+            style={{
+              marginTop: "0.6rem",
+              background: "none",
+              border: "none",
+              padding: 0,
+              fontSize: "0.8rem",
+              color: "var(--muted)",
+              textDecoration: "underline",
+              cursor: "pointer",
+            }}
+          >
+            Forgot your password, or never set one?
+          </button>
+        )}
+
+        {forgotMode && forgotStatus !== "sent" && (
+          <form onSubmit={sendPasswordReset} style={{ marginTop: "0.75rem" }}>
+            <p style={{ fontSize: "0.8rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
+              Enter your email and we&apos;ll send a link to set a new password. This also works if
+              you&apos;ve never set a password before.
+            </p>
+            <button
+              type="submit"
+              disabled={forgotStatus === "sending" || !pwEmail}
+              style={{
+                width: "100%",
+                padding: "0.55rem 1rem",
+                borderRadius: "6px",
+                border: "1px solid var(--border-strong)",
+                background: "var(--surface)",
+                color: "var(--text)",
+                fontSize: "0.85rem",
+                fontWeight: 600,
+                cursor: forgotStatus === "sending" ? "default" : "pointer",
+                opacity: forgotStatus === "sending" ? 0.7 : 1,
+              }}
+            >
+              {forgotStatus === "sending" ? "Sending…" : `Email a password-reset link to ${pwEmail || "…"}`}
+            </button>
+            {forgotStatus === "error" && (
+              <p style={{ marginTop: "0.6rem", fontSize: "0.8rem", color: "var(--brand-pink)" }}>
+                {forgotErrorMessage}
+              </p>
+            )}
+          </form>
+        )}
+
+        {forgotStatus === "sent" && (
+          <p style={{ marginTop: "0.75rem", fontSize: "0.85rem", color: "var(--brand-blue-dk)" }}>
+            Check <strong>{pwEmail}</strong> for a link to set your password.
+          </p>
+        )}
       </div>
     </div>
   );
