@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import type { FinishWithUsage } from "@/lib/types/rooms";
 
@@ -88,6 +88,16 @@ export default function FinishesRepository({
     });
   }, [finishes, query, scope, productType]);
 
+  const grouped = useMemo(() => {
+    const byType = new Map<string, FinishWithUsage[]>();
+    for (const f of filtered) {
+      const list = byType.get(f.product_type) ?? [];
+      list.push(f);
+      byType.set(f.product_type, list);
+    }
+    return Array.from(byType.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [filtered]);
+
   return (
     <div>
       <div style={{ display: "flex", flexWrap: "wrap", gap: "0.75rem", marginBottom: "1.25rem" }}>
@@ -131,7 +141,6 @@ export default function FinishesRepository({
           <thead>
             <tr>
               <th style={th}>Code</th>
-              <th style={th}>Product type</th>
               <th style={th}>Product</th>
               <th style={th}>Color</th>
               <th style={th}>Scope</th>
@@ -141,33 +150,53 @@ export default function FinishesRepository({
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={6} style={{ ...td, color: "var(--hint)", fontStyle: "italic" }}>
+                <td colSpan={5} style={{ ...td, color: "var(--hint)", fontStyle: "italic" }}>
                   No finishes match this search.
                 </td>
               </tr>
             ) : (
-              filtered.map((f) => (
-                <tr key={f.code}>
-                  <td style={{ ...td, fontFamily: "monospace", fontWeight: 600 }}>
-                    <Link href={`/finishes/${f.code}`} style={{ color: "var(--brand-blue-dk)" }}>
-                      {f.code}
-                    </Link>
-                  </td>
-                  <td style={td}>{f.product_type}</td>
-                  <td style={td}>
-                    {[f.manufacturer, f.product_name].filter(Boolean).join(" — ") || "—"}
-                  </td>
-                  <td style={td}>
-                    <Swatch color={f.color} />
-                    {f.color ?? "—"}
-                  </td>
-                  <td style={{ ...td, color: "var(--muted)" }}>{f.guideline_scope}</td>
-                  <td style={{ ...td, color: "var(--muted)" }}>
-                    {f.usedInRooms.length === 0
-                      ? "Not yet assigned"
-                      : f.usedInRooms.map((r) => r.name).join(", ")}
-                  </td>
-                </tr>
+              grouped.map(([groupType, items]) => (
+                <React.Fragment key={groupType}>
+                  <tr>
+                    <td
+                      colSpan={5}
+                      style={{
+                        padding: "0.5rem 0.85rem",
+                        background: "var(--brand-charcoal-lt)",
+                        fontSize: "0.72rem",
+                        fontWeight: 700,
+                        letterSpacing: "0.04em",
+                        textTransform: "uppercase",
+                        color: "var(--muted)",
+                        borderBottom: "1px solid var(--border)",
+                      }}
+                    >
+                      {groupType} ({items.length})
+                    </td>
+                  </tr>
+                  {items.map((f) => (
+                    <tr key={f.code}>
+                      <td style={{ ...td, fontFamily: "monospace", fontWeight: 600 }}>
+                        <Link href={`/finishes/${f.code}`} style={{ color: "var(--brand-blue-dk)" }}>
+                          {f.code}
+                        </Link>
+                      </td>
+                      <td style={td}>
+                        {[f.manufacturer, f.product_name].filter(Boolean).join(" — ") || "—"}
+                      </td>
+                      <td style={td}>
+                        <Swatch color={f.color} />
+                        {f.color ?? "—"}
+                      </td>
+                      <td style={{ ...td, color: "var(--muted)" }}>{f.guideline_scope}</td>
+                      <td style={{ ...td, color: "var(--muted)" }}>
+                        {f.usedInRooms.length === 0
+                          ? "Not yet assigned"
+                          : f.usedInRooms.map((r) => r.name).join(", ")}
+                      </td>
+                    </tr>
+                  ))}
+                </React.Fragment>
               ))
             )}
           </tbody>
