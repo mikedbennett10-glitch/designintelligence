@@ -72,6 +72,7 @@ export default async function FinishDetailPage({
           <ProductFacts
             facts={[
               { label: "Product type", value: finish.product_type },
+              { label: "Legacy code", value: finish.legacy_code },
               { label: "Manufacturer", value: finish.manufacturer },
               { label: "Product number", value: finish.product_number },
               { label: "Color", value: finish.color },
@@ -79,6 +80,8 @@ export default async function FinishDetailPage({
               { label: "Scope", value: finish.guideline_scope },
               { label: "Installation notes", value: finish.installation_notes },
               { label: "Sustainability", value: finish.sustainability },
+              { label: "Location", value: finish.location },
+              { label: "Vendor contact", value: finish.vendor_contact },
             ]}
           />
           <ProductExternalLinks productUrl={finish.product_url} />

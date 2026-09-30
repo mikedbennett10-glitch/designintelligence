@@ -87,6 +87,9 @@ export interface Finish {
   swatch_gcs_path: string | null;
   room_applications: string[] | null;
   product_url: string | null;
+  legacy_code: string | null;
+  location: string | null;
+  vendor_contact: string | null;
   is_active: boolean;
   edition_id: number | null;
   created_at: string;
