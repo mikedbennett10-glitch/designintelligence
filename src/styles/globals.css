@@ -99,3 +99,62 @@ svg {
   border-color: var(--border);
   box-shadow: none;
 }
+
+/* ============================================================
+   Mobile layout (<=768px)
+   ============================================================
+   First pass: top-nav-only on mobile, no sidebar. Most mobile visits are
+   someone confirming a specific item they already know about (a room, a
+   finish code) rather than browsing, so the sidebar's room tree isn't
+   worth the screen space — search covers that use case instead.
+
+   !important is used only where a component also sets `display` inline
+   (inline styles otherwise win over any stylesheet rule); the dip-sidebar
+   rule doesn't need it since <nav> has no competing inline display. */
+
+.dip-mobile-menu-toggle,
+.dip-mobile-search {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .dip-sidebar {
+    display: none;
+  }
+
+  .dip-main-content {
+    padding: 1rem !important;
+  }
+
+  .dip-header-desktop-nav {
+    display: none !important;
+  }
+
+  .dip-mobile-menu-toggle {
+    display: inline-flex !important;
+  }
+
+  .dip-mobile-search {
+    display: flex !important;
+  }
+
+  .dip-header-subtitle {
+    display: none;
+  }
+
+  .dip-header-title {
+    flex-shrink: 1 !important;
+    min-width: 0;
+    overflow: hidden;
+  }
+
+  .dip-header-title-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  body {
+    font-size: 16px;
+  }
+}

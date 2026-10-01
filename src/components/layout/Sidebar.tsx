@@ -68,6 +68,7 @@ export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
   return (
     <nav
       aria-label="Guidelines navigation"
+      className="dip-sidebar"
       style={{
         width: "var(--sidebar-width)",
         flexShrink: 0,
