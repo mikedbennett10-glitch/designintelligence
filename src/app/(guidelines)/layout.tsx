@@ -38,12 +38,15 @@ export default async function GuidelinesLayout({
   ]);
 
   return (
-    <div>
+    <div style={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <Header user={user} />
       {activeProject && <ProjectContextBar project={activeProject} />}
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
         <Sidebar rooms={rooms} />
-        <main className="dip-main-content" style={{ flex: 1, minWidth: 0, padding: "2rem" }}>
+        <main
+          className="dip-main-content"
+          style={{ flex: 1, minWidth: 0, padding: "2rem", overflowY: "auto" }}
+        >
           {children}
         </main>
       </div>

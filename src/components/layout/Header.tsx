@@ -31,6 +31,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
       style={{
         background: "var(--surface)",
         borderBottom: "1px solid var(--border)",
+        flexShrink: 0,
       }}
     >
       <div

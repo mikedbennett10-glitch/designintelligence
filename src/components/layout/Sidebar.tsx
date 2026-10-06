@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState } from "react";
 
 export interface SidebarRoomItem {
   taxonomy_id: string;
@@ -64,6 +65,19 @@ function groupRoomsBySection(rooms: SidebarRoomItem[]) {
 export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
   const pathname = usePathname();
   const groups = groupRoomsBySection(rooms);
+  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+
+  function toggleSection(section: string) {
+    setCollapsed((prev) => {
+      const next = new Set(prev);
+      if (next.has(section)) {
+        next.delete(section);
+      } else {
+        next.add(section);
+      }
+      return next;
+    });
+  }
 
   return (
     <nav
@@ -74,56 +88,83 @@ export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
         flexShrink: 0,
         borderRight: "1px solid var(--border)",
         background: "var(--surface)",
-        height: "calc(100vh - var(--header-height))",
+        height: "100%",
         overflowY: "auto",
         padding: "1.25rem 0",
       }}
     >
       <StaticGroup title="Prototype Plans" items={PROTOTYPE_PLANS} />
 
-      {groups.map(({ section, rooms: sectionRooms }) => (
-        <div key={section} style={{ marginBottom: "1.5rem" }}>
-          <div
-            style={{
-              padding: "0 1.25rem",
-              fontSize: "0.7rem",
-              fontWeight: 700,
-              letterSpacing: "0.06em",
-              textTransform: "uppercase",
-              color: "var(--muted)",
-              marginBottom: "0.5rem",
-            }}
-          >
-            {section}
+      {groups.map(({ section, rooms: sectionRooms }) => {
+        const isOpen = !collapsed.has(section);
+        return (
+          <div key={section} style={{ marginBottom: "1.5rem" }}>
+            <button
+              type="button"
+              onClick={() => toggleSection(section)}
+              aria-expanded={isOpen}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "0.4rem",
+                width: "100%",
+                padding: "0 1.25rem",
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontFamily: "inherit",
+                fontSize: "0.7rem",
+                fontWeight: 700,
+                letterSpacing: "0.06em",
+                textTransform: "uppercase",
+                color: "var(--muted)",
+                marginBottom: "0.5rem",
+              }}
+            >
+              <span
+                style={{
+                  display: "inline-block",
+                  transition: "transform 0.15s ease",
+                  transform: isOpen ? "rotate(90deg)" : "rotate(0deg)",
+                  fontSize: "0.65rem",
+                  flexShrink: 0,
+                }}
+              >
+                &#9656;
+              </span>
+              <span style={{ textAlign: "left" }}>{section}</span>
+            </button>
+            {isOpen && (
+              <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
+                {sectionRooms.map((room) => {
+                  const href = `/ambulatory/rooms/${room.taxonomy_id}`;
+                  const active = pathname === href;
+                  return (
+                    <li key={room.taxonomy_id}>
+                      <Link
+                        href={href}
+                        style={{
+                          display: "block",
+                          padding: "0.4rem 1.25rem",
+                          fontSize: "0.875rem",
+                          color: active ? "var(--brand-blue-dk)" : "var(--text)",
+                          background: active ? "var(--brand-blue-lt)" : "transparent",
+                          borderLeft: active
+                            ? "3px solid var(--brand-blue)"
+                            : "3px solid transparent",
+                          textDecoration: "none",
+                        }}
+                      >
+                        {room.name}
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
           </div>
-          <ul style={{ listStyle: "none", margin: 0, padding: 0 }}>
-            {sectionRooms.map((room) => {
-              const href = `/ambulatory/rooms/${room.taxonomy_id}`;
-              const active = pathname === href;
-              return (
-                <li key={room.taxonomy_id}>
-                  <Link
-                    href={href}
-                    style={{
-                      display: "block",
-                      padding: "0.4rem 1.25rem",
-                      fontSize: "0.875rem",
-                      color: active ? "var(--brand-blue-dk)" : "var(--text)",
-                      background: active ? "var(--brand-blue-lt)" : "transparent",
-                      borderLeft: active
-                        ? "3px solid var(--brand-blue)"
-                        : "3px solid transparent",
-                      textDecoration: "none",
-                    }}
-                  >
-                    {room.name}
-                  </Link>
-                </li>
-              );
-            })}
-          </ul>
-        </div>
-      ))}
+        );
+      })}
 
       <StaticGroup title="Guidelines & Standards" items={GUIDELINES_AND_STANDARDS} />
       <StaticGroup title="About This Document" items={ABOUT_THIS_DOCUMENT} />

@@ -12,6 +12,7 @@ export default function ProjectContextBar({ project }: { project: ProjectWithEdi
         background: "var(--brand-blue-dk)",
         color: "#fff",
         fontSize: "0.82rem",
+        flexShrink: 0,
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "0.6rem" }}>
