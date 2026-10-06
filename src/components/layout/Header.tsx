@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -47,23 +48,30 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           className="dip-header-title"
           style={{
             display: "flex",
-            alignItems: "baseline",
-            gap: "0.5rem",
+            alignItems: "center",
+            gap: "0.65rem",
             textDecoration: "none",
             flexShrink: 0,
           }}
         >
-          <span
-            className="dip-header-title-text"
-            style={{
-              fontFamily: "var(--font-doc)",
-              fontWeight: 700,
-              fontSize: "1.1rem",
-              color: "var(--brand-blue-dk)",
-            }}
-          >
-            Design Intelligence Platform
-          </span>
+          <Image
+            src="/brand/logo.png"
+            alt="Design Intelligence Platform"
+            width={1000}
+            height={500}
+            priority
+            className="dip-logo-full"
+            style={{ height: "30px", width: "auto" }}
+          />
+          <Image
+            src="/brand/mark.png"
+            alt="Design Intelligence Platform"
+            width={256}
+            height={256}
+            priority
+            className="dip-logo-mark"
+            style={{ height: "32px", width: "auto" }}
+          />
           <span className="dip-header-subtitle" style={{ fontSize: "0.75rem", color: "var(--muted)", whiteSpace: "nowrap" }}>
             Design & Construction
           </span>

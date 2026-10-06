@@ -113,7 +113,8 @@ svg {
    rule doesn't need it since <nav> has no competing inline display. */
 
 .dip-mobile-menu-toggle,
-.dip-mobile-search {
+.dip-mobile-search,
+.dip-logo-mark {
   display: none;
 }
 
@@ -148,10 +149,12 @@ svg {
     overflow: hidden;
   }
 
-  .dip-header-title-text {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+  .dip-logo-full {
+    display: none !important;
+  }
+
+  .dip-logo-mark {
+    display: inline-block !important;
   }
 
   body {
