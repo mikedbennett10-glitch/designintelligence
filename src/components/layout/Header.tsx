@@ -61,7 +61,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
             height={500}
             priority
             className="dip-logo-full"
-            style={{ height: "30px", width: "auto" }}
+            style={{ height: "64px", width: "auto" }}
           />
           <Image
             src="/brand/mark.png"
@@ -70,11 +70,8 @@ export default function Header({ user }: { user: HeaderUser | null }) {
             height={256}
             priority
             className="dip-logo-mark"
-            style={{ height: "32px", width: "auto" }}
+            style={{ height: "64px", width: "auto" }}
           />
-          <span className="dip-header-subtitle" style={{ fontSize: "0.75rem", color: "var(--muted)", whiteSpace: "nowrap" }}>
-            Design & Construction
-          </span>
         </Link>
 
         {user && (

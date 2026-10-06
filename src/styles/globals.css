@@ -24,7 +24,7 @@
   --font-ui: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-doc: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
 
-  --header-height: 64px;
+  --header-height: 96px;
   --sidebar-width: 288px;
 }
 
@@ -137,10 +137,6 @@ svg {
 
   .dip-mobile-search {
     display: flex !important;
-  }
-
-  .dip-header-subtitle {
-    display: none;
   }
 
   .dip-header-title {
