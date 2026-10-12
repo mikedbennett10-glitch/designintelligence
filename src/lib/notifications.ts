@@ -3,7 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 
 export interface NotificationRow {
   id: number;
-  notification_type: "edition_change" | "deviation_decision";
+  notification_type: "edition_change" | "deviation_decision" | "deviation_submitted";
   project_id: number | null;
   room_taxonomy_id: string | null;
   deviation_id: number | null;
@@ -59,10 +59,15 @@ export async function attemptSendNotification(id: number): Promise<{ ok: boolean
  * Enqueues a notification tied to a deviation decision (WBS 7.2.2 — the
  * requester is notified of the outcome). Edition-change notifications
  * are enqueued automatically by the enqueue_edition_change_notifications
- * DB trigger; this is the one notification type with no natural DB
- * trigger point (a deviation UPDATE doesn't by itself imply "notify the
- * submitter" the way a room content change does), so it's enqueued
- * app-side instead.
+ * DB trigger; a deviation DECISION has no natural DB trigger point (an
+ * UPDATE doesn't by itself imply "notify the submitter" the way a room
+ * content change does, and only the admin UI knows the human-readable
+ * decision text), so it's enqueued app-side instead. The new-SUBMISSION
+ * notification (WBS 7.2.1/7.2.3, "the Platform Owner has been
+ * notified") is the opposite case — it only needs the row that was just
+ * inserted, so that one IS a DB trigger
+ * (enqueue_deviation_submitted_notifications, notifying every
+ * tier='administrative' user) rather than app code here.
  */
 export async function enqueueDeviationDecisionNotification(params: {
   deviationId: number;

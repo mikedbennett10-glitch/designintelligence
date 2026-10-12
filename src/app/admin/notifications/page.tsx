@@ -13,6 +13,7 @@ const STATUS_STYLES: Record<NotificationRow["status"], { bg: string; fg: string;
 const TYPE_LABELS: Record<NotificationRow["notification_type"], string> = {
   edition_change: "Edition change",
   deviation_decision: "Deviation decision",
+  deviation_submitted: "Deviation submitted",
 };
 
 async function getNotifications(): Promise<NotificationRow[]> {
