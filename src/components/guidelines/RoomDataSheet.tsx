@@ -270,7 +270,14 @@ export default function RoomDataSheet({
         <SpecPanel finishes={finishes} equipment={equipment} furniture={furniture} />
       )}
 
-      {tab === "Drawings" && <DrawingViewer drawings={drawings} axonType={room.axon_type} />}
+      {tab === "Drawings" && (
+        <DrawingViewer
+          drawings={drawings}
+          axonType={room.axon_type}
+          equipment={equipment}
+          furniture={furniture}
+        />
+      )}
 
       {tab === "Version History" && <VersionHistory entries={versionHistory} />}
     </div>
