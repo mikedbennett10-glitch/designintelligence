@@ -2,8 +2,12 @@
   <!-- Dev schematic floor plan, hand-built — AMB-ROOM-EX-001, Exam Room Typical 2-Door.
        Not production artwork (that's a consultant deliverable, WBS 3.4.1).
        Proves the WBS 3.5.1 SVG → room-data lookup engine: every
-       data-taxonomy-id below matches a real room_furniture/room_equipment
-       link for this room (see supabase/seed/003_example_room_content.sql). -->
+       data-taxonomy-id below matches a real room_equipment link for this
+       room (see supabase/seed/003_example_room_content.sql). Furniture
+       hotspots (provider stool, guest chair) were dropped when the
+       placeholder SHR-FURN-* rows they pointed at were deleted (Oct 13) —
+       the shapes stay as plain room furnishings, just non-interactive,
+       until real formulary items are linked to this room. -->
 
   <rect x="2" y="2" width="140" height="104" rx="1" fill="#fafaf8" stroke="#44433f" stroke-width="2.5" />
 
@@ -38,19 +42,17 @@
     <text x="94" y="56" font-size="5" fill="#1e1e1c" text-anchor="middle">Exam Table</text>
   </g>
 
-  <!-- Provider stool -->
-  <g class="hotspot" data-taxonomy-id="SHR-FURN-STOOL-01" tabindex="0" role="button"
-     aria-label="Provider Stool, Height-Adjustable">
-    <circle cx="60" cy="75" r="8" fill="#fde6f2" stroke="#b8004f" stroke-width="0.9" />
-    <text x="60" y="88" font-size="4" fill="#1e1e1c" text-anchor="middle">Stool</text>
+  <!-- Provider stool (not a hotspot — no furniture item linked to this room yet) -->
+  <g>
+    <circle cx="60" cy="75" r="8" fill="#f0efed" stroke="#a5a199" stroke-width="0.9" />
+    <text x="60" y="88" font-size="4" fill="#6f6c66" text-anchor="middle">Stool</text>
   </g>
 
-  <!-- Exam Room Guest Chair -->
-  <g class="hotspot" data-taxonomy-id="SHR-FURN-EXAMCHAIR-01" tabindex="0" role="button"
-     aria-label="Exam Room Guest Chair">
-    <rect x="98" y="78" width="22" height="20" rx="3" fill="#fde6f2" stroke="#b8004f" stroke-width="0.9" />
-    <text x="109" y="90" font-size="4" fill="#1e1e1c" text-anchor="middle">Guest</text>
-    <text x="109" y="94.5" font-size="4" fill="#1e1e1c" text-anchor="middle">chair</text>
+  <!-- Exam Room Guest Chair (not a hotspot — no furniture item linked to this room yet) -->
+  <g>
+    <rect x="98" y="78" width="22" height="20" rx="3" fill="#f0efed" stroke="#a5a199" stroke-width="0.9" />
+    <text x="109" y="90" font-size="4" fill="#6f6c66" text-anchor="middle">Guest</text>
+    <text x="109" y="94.5" font-size="4" fill="#6f6c66" text-anchor="middle">chair</text>
   </g>
 
   <text x="4" y="102" font-size="3.5" fill="#a5a199">dev schematic — not production artwork</text>
