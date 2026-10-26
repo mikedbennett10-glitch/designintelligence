@@ -53,12 +53,6 @@ const statusColors: Record<RoomDrawing["status"], { bg: string; fg: string }> = 
 // referenced by file_name on a room_drawings row with is_schematic=TRUE —
 // there's no storage bucket wired up for real drawing assets yet (unlike
 // product-images), so this is the interim convention until one exists.
-function findSchematicAsset(drawings: RoomDrawing[]): RoomDrawing | null {
-  return (
-    drawings.find((d) => d.is_schematic && d.file_name?.startsWith("/schematics/")) ?? null
-  );
-}
-
 function findSchematicForType(drawings: RoomDrawing[], type: DrawingType): RoomDrawing | null {
   return (
     drawings.find(
@@ -89,12 +83,17 @@ export default function DrawingViewer({
   }
   const types = expected.length > 0 ? expected : (Array.from(byType.keys()) as DrawingType[]);
 
-  const schematic = findSchematicAsset(drawings);
+  const [selected, setSelected] = useState<DrawingType | null>(types[0] ?? null);
+  const activeType = selected && types.includes(selected) ? selected : (types[0] ?? null);
+
+  const activeLatest = activeType ? (byType.get(activeType)?.[0] ?? null) : null;
+  const activeSchematic = activeType ? findSchematicForType(drawings, activeType) : null;
+
   const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
   const [svgError, setSvgError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!schematic?.file_name) {
+    if (!activeSchematic?.file_name) {
       setSvgMarkup(null);
       setSvgError(null);
       return;
@@ -102,7 +101,7 @@ export default function DrawingViewer({
     let cancelled = false;
     setSvgMarkup(null);
     setSvgError(null);
-    fetch(schematic.file_name)
+    fetch(activeSchematic.file_name)
       .then((res) => {
         if (!res.ok) throw new Error(String(res.status));
         return res.text();
@@ -111,12 +110,12 @@ export default function DrawingViewer({
         if (!cancelled) setSvgMarkup(text);
       })
       .catch(() => {
-        if (!cancelled) setSvgError("Couldn't load the schematic preview.");
+        if (!cancelled) setSvgError("Couldn't load this drawing.");
       });
     return () => {
       cancelled = true;
     };
-  }, [schematic?.file_name]);
+  }, [activeSchematic?.file_name]);
 
   if (types.length === 0) {
     return (
@@ -127,89 +126,67 @@ export default function DrawingViewer({
   }
 
   return (
-    <div>
+    <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
-          gap: "1rem",
+          flex: "0 0 220px",
+          display: "flex",
+          flexDirection: "column",
+          gap: "0.4rem",
         }}
       >
         {types.map((type) => {
-          const versions = byType.get(type) ?? [];
-          const latest = versions[0];
-          const thumbnail = findSchematicForType(drawings, type);
+          const latest = byType.get(type)?.[0];
+          const isActive = type === activeType;
           return (
-            <div
+            <button
               key={type}
+              onClick={() => setSelected(type)}
               style={{
-                border: "1px solid var(--border)",
+                textAlign: "left",
+                border: "1px solid " + (isActive ? "var(--brand-blue)" : "var(--border)"),
+                background: isActive ? "var(--brand-blue-lt)" : "var(--surface)",
                 borderRadius: "8px",
-                background: "var(--surface)",
-                overflow: "hidden",
+                padding: "0.55rem 0.7rem",
+                cursor: "pointer",
+                font: "inherit",
               }}
             >
-              <div
-                style={{
-                  aspectRatio: "4 / 3",
-                  background: "var(--brand-charcoal-lt)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  color: "var(--hint)",
-                  fontSize: "0.75rem",
-                  overflow: "hidden",
-                }}
-              >
-                {thumbnail?.file_name ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- static /public schematic, not an optimizable remote image
-                  <img
-                    src={thumbnail.file_name}
-                    alt={DRAWING_LABELS[type]}
-                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                  />
-                ) : latest?.gcs_path ? (
-                  "Asset on file"
-                ) : (
-                  "Not yet available"
-                )}
-              </div>
-              <div style={{ padding: "0.6rem 0.75rem" }}>
-                <div style={{ fontWeight: 600, fontSize: "0.85rem", marginBottom: "0.25rem" }}>
-                  {DRAWING_LABELS[type]}
+              <div style={{ fontWeight: 600, fontSize: "0.85rem" }}>{DRAWING_LABELS[type]}</div>
+              {latest ? (
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "0.35rem",
+                    fontSize: "0.68rem",
+                    padding: "0.05rem 0.45rem",
+                    borderRadius: "999px",
+                    marginTop: "0.3rem",
+                    background: statusColors[latest.status].bg,
+                    color: statusColors[latest.status].fg,
+                  }}
+                >
+                  {latest.status}
+                  {latest.is_schematic ? " · schematic" : ""}
+                  {latest.version ? ` · ${latest.version}` : ""}
                 </div>
-                {latest ? (
-                  <div
-                    style={{
-                      display: "inline-flex",
-                      alignItems: "center",
-                      gap: "0.35rem",
-                      fontSize: "0.72rem",
-                      padding: "0.1rem 0.5rem",
-                      borderRadius: "999px",
-                      background: statusColors[latest.status].bg,
-                      color: statusColors[latest.status].fg,
-                    }}
-                  >
-                    {latest.status}
-                    {latest.is_schematic ? " · schematic" : ""}
-                    {latest.version ? ` · ${latest.version}` : ""}
-                  </div>
-                ) : (
-                  <div style={{ fontSize: "0.72rem", color: "var(--hint)" }}>pending</div>
-                )}
-              </div>
-            </div>
+              ) : (
+                <div style={{ fontSize: "0.68rem", color: "var(--hint)", marginTop: "0.3rem" }}>
+                  not yet available
+                </div>
+              )}
+            </button>
           );
         })}
       </div>
 
-      {schematic && (
-        <div style={{ marginTop: "1.5rem" }}>
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
-            <h3 style={{ fontSize: "0.9rem", margin: 0 }}>
-              Interactive preview — {DRAWING_LABELS[schematic.drawing_type]}
-            </h3>
+      <div style={{ flex: "1 1 0%", minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", marginBottom: "0.6rem" }}>
+          <h3 style={{ fontSize: "0.95rem", margin: 0 }}>
+            {activeType ? DRAWING_LABELS[activeType] : ""}
+          </h3>
+          {activeSchematic && (
             <span
               style={{
                 fontSize: "0.68rem",
@@ -221,16 +198,34 @@ export default function DrawingViewer({
             >
               dev schematic, not production artwork
             </span>
-          </div>
-          {svgMarkup ? (
+          )}
+        </div>
+
+        {activeSchematic ? (
+          svgMarkup ? (
             <SvgHotspotViewer svgMarkup={svgMarkup} lookup={buildTaxonomyLookup(equipment, furniture)} />
           ) : svgError ? (
             <p style={{ color: "var(--hint)", fontSize: "0.82rem" }}>{svgError}</p>
           ) : (
             <p style={{ color: "var(--hint)", fontSize: "0.82rem" }}>Loading…</p>
-          )}
-        </div>
-      )}
+          )
+        ) : (
+          <div
+            style={{
+              aspectRatio: "4 / 3",
+              background: "var(--brand-charcoal-lt)",
+              borderRadius: "8px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              color: "var(--hint)",
+              fontSize: "0.85rem",
+            }}
+          >
+            {activeLatest?.gcs_path ? "Asset on file" : "Not yet available"}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
