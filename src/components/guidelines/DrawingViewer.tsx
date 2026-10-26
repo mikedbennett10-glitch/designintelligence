@@ -24,12 +24,19 @@ const DRAWING_LABELS: Record<DrawingType, string> = {
 };
 
 /**
- * Which drawing types this room is expected to have, driven by axon_type:
+ * Which drawing types this room is expected to have.
+ * A room's own `expected_drawing_types` wins when set -- for rooms whose
+ * real documented view set doesn't fit one of the 3 axon_type buckets
+ * (e.g. no north wall drawn, no axon). Otherwise falls back to axon_type:
  *   1 = Full: FP + RCP + 4 elevations + axon
  *   2 = Plan + elevations only (no axon)
  *   3 = Plan only
  */
-function expectedDrawingTypes(axonType: AxonType | null): DrawingType[] {
+function expectedDrawingTypes(
+  axonType: AxonType | null,
+  override: DrawingType[] | null
+): DrawingType[] {
+  if (override && override.length > 0) return override;
   if (axonType === 1) return ["fp", "rcp", "elev-n", "elev-s", "elev-e", "elev-w", "axon"];
   if (axonType === 2) return ["fp", "elev-n", "elev-s", "elev-e", "elev-w"];
   if (axonType === 3) return ["fp"];
@@ -52,18 +59,28 @@ function findSchematicAsset(drawings: RoomDrawing[]): RoomDrawing | null {
   );
 }
 
+function findSchematicForType(drawings: RoomDrawing[], type: DrawingType): RoomDrawing | null {
+  return (
+    drawings.find(
+      (d) => d.drawing_type === type && d.is_schematic && d.file_name?.startsWith("/schematics/")
+    ) ?? null
+  );
+}
+
 export default function DrawingViewer({
   drawings,
   axonType,
+  expectedTypes = null,
   equipment = [],
   furniture = [],
 }: {
   drawings: RoomDrawing[];
   axonType: AxonType | null;
+  expectedTypes?: DrawingType[] | null;
   equipment?: RoomEquipmentWithDetail[];
   furniture?: RoomFurnitureWithDetail[];
 }) {
-  const expected = expectedDrawingTypes(axonType);
+  const expected = expectedDrawingTypes(axonType, expectedTypes);
   const byType = new Map<DrawingType, RoomDrawing[]>();
   for (const d of drawings) {
     const list = byType.get(d.drawing_type) ?? [];
@@ -121,6 +138,7 @@ export default function DrawingViewer({
         {types.map((type) => {
           const versions = byType.get(type) ?? [];
           const latest = versions[0];
+          const thumbnail = findSchematicForType(drawings, type);
           return (
             <div
               key={type}
@@ -140,9 +158,21 @@ export default function DrawingViewer({
                   justifyContent: "center",
                   color: "var(--hint)",
                   fontSize: "0.75rem",
+                  overflow: "hidden",
                 }}
               >
-                {latest?.gcs_path ? "Asset on file" : "Not yet available"}
+                {thumbnail?.file_name ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- static /public schematic, not an optimizable remote image
+                  <img
+                    src={thumbnail.file_name}
+                    alt={DRAWING_LABELS[type]}
+                    style={{ width: "100%", height: "100%", objectFit: "contain" }}
+                  />
+                ) : latest?.gcs_path ? (
+                  "Asset on file"
+                ) : (
+                  "Not yet available"
+                )}
               </div>
               <div style={{ padding: "0.6rem 0.75rem" }}>
                 <div style={{ fontWeight: 600, fontSize: "0.85rem", marginBottom: "0.25rem" }}>

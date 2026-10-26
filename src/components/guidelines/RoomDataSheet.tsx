@@ -274,6 +274,7 @@ export default function RoomDataSheet({
         <DrawingViewer
           drawings={drawings}
           axonType={room.axon_type}
+          expectedTypes={room.expected_drawing_types}
           equipment={equipment}
           furniture={furniture}
         />

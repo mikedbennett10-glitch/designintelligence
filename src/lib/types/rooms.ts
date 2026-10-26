@@ -54,6 +54,7 @@ export interface Room {
   adjacency_room_ids: string[] | null;
   adjacency_labels: string[] | null;
   axon_type: AxonType | null;
+  expected_drawing_types: DrawingType[] | null;
   edition_id: number;
   is_active: boolean;
   is_published: boolean;
