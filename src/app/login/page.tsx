@@ -1,10 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
+  const [callbackError, setCallbackError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("error") === "auth") {
+      setCallbackError(params.get("reason") || "Sign-in link failed.");
+    }
+  }, []);
+
   const [email, setEmail] = useState("");
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -108,6 +117,23 @@ export default function LoginPage() {
         <p style={{ margin: "0 0 1.75rem", fontSize: "0.85rem", color: "var(--muted)" }}>
           Design & Construction
         </p>
+
+        {callbackError && (
+          <div
+            style={{
+              marginBottom: "1.25rem",
+              padding: "0.65rem 0.85rem",
+              borderRadius: "6px",
+              background: "var(--brand-pink-lt)",
+              border: "1px solid var(--brand-pink)",
+              fontSize: "0.8rem",
+              color: "var(--text)",
+            }}
+          >
+            Sign-in link didn&apos;t work: {callbackError}. Request a new link below, and open it
+            in the same browser you requested it from.
+          </div>
+        )}
 
         <button
           onClick={signInWithGoogle}
