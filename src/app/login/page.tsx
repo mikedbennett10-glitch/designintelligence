@@ -6,11 +6,19 @@ import { createClient } from "@/lib/supabase/client";
 
 export default function LoginPage() {
   const [callbackError, setCallbackError] = useState<string | null>(null);
+  const [rawDebug, setRawDebug] = useState<string | null>(null);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.get("error") === "auth") {
       setCallbackError(params.get("reason") || "Sign-in link failed.");
+    }
+    // Diagnostic: show the exact URL we landed on (query + hash), so we can
+    // see what Supabase actually sent back even if it's not a shape our
+    // own /auth/callback route recognizes (e.g. its own error params from
+    // its hosted verify endpoint, or implicit-flow tokens in the hash).
+    if (window.location.search || window.location.hash) {
+      setRawDebug(`${window.location.pathname}${window.location.search}${window.location.hash}`);
     }
   }, []);
 
@@ -31,37 +39,54 @@ export default function LoginPage() {
     e.preventDefault();
     setPwStatus("sending");
     setPwErrorMessage(null);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email: pwEmail, password });
-    if (error) {
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email: pwEmail, password });
+      if (error) {
+        setPwStatus("error");
+        setPwErrorMessage(`${error.message} (status ${error.status ?? "?"}, code ${error.code ?? "?"})`);
+        return;
+      }
+      window.location.href = "/";
+    } catch (err) {
       setPwStatus("error");
-      setPwErrorMessage(error.message);
-      return;
+      setPwErrorMessage(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
     }
-    window.location.href = "/";
   }
 
   async function signInWithGoogle() {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: { redirectTo: `${window.location.origin}/auth/callback` },
-    });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: { redirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (error) {
+        setCallbackError(`Google sign-in: ${error.message}`);
+      }
+    } catch (err) {
+      setCallbackError(`Google sign-in unexpected error: ${err instanceof Error ? err.message : String(err)}`);
+    }
   }
 
   async function sendPasswordReset(e: React.FormEvent) {
     e.preventDefault();
     setForgotStatus("sending");
     setForgotErrorMessage(null);
-    const supabase = createClient();
-    const { error } = await supabase.auth.resetPasswordForEmail(pwEmail, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
-    });
-    if (error) {
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.resetPasswordForEmail(pwEmail, {
+        redirectTo: `${window.location.origin}/auth/callback?next=/auth/reset-password`,
+      });
+      if (error) {
+        setForgotStatus("error");
+        setForgotErrorMessage(`${error.message} (status ${error.status ?? "?"}, code ${error.code ?? "?"})`);
+      } else {
+        setForgotStatus("sent");
+      }
+    } catch (err) {
       setForgotStatus("error");
-      setForgotErrorMessage(error.message);
-    } else {
-      setForgotStatus("sent");
+      setForgotErrorMessage(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -69,16 +94,21 @@ export default function LoginPage() {
     e.preventDefault();
     setStatus("sending");
     setErrorMessage(null);
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
-    });
-    if (error) {
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithOtp({
+        email,
+        options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+      });
+      if (error) {
+        setStatus("error");
+        setErrorMessage(`${error.message} (status ${error.status ?? "?"}, code ${error.code ?? "?"})`);
+      } else {
+        setStatus("sent");
+      }
+    } catch (err) {
       setStatus("error");
-      setErrorMessage(error.message);
-    } else {
-      setStatus("sent");
+      setErrorMessage(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -132,6 +162,24 @@ export default function LoginPage() {
           >
             Sign-in link didn&apos;t work: {callbackError}. Request a new link below, and open it
             in the same browser you requested it from.
+          </div>
+        )}
+
+        {rawDebug && (
+          <div
+            style={{
+              marginBottom: "1.25rem",
+              padding: "0.65rem 0.85rem",
+              borderRadius: "6px",
+              background: "var(--bg)",
+              border: "1px dashed var(--border-strong)",
+              fontSize: "0.72rem",
+              color: "var(--muted)",
+              fontFamily: "monospace",
+              wordBreak: "break-all",
+            }}
+          >
+            DEBUG — landed on: {rawDebug}
           </div>
         )}
 
