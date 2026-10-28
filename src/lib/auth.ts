@@ -50,6 +50,10 @@ export async function getCurrentUserDebug(): Promise<{
   authEmail: string | null;
   profileFound: boolean;
   profileError: string | null;
+  fullSelectFound: boolean;
+  fullSelectError: string | null;
+  fullSelectErrorDetails: unknown;
+  fullSelectData: unknown;
 }> {
   const supabase = await createClient();
   const {
@@ -63,6 +67,10 @@ export async function getCurrentUserDebug(): Promise<{
       authEmail: null,
       profileFound: false,
       profileError: authError?.message ?? null,
+      fullSelectFound: false,
+      fullSelectError: null,
+      fullSelectErrorDetails: null,
+      fullSelectData: null,
     };
   }
 
@@ -72,11 +80,25 @@ export async function getCurrentUserDebug(): Promise<{
     .eq("email", authUser.email)
     .maybeSingle();
 
+  // Run the exact query getCurrentUser() runs (same columns, .single()) so
+  // we can see whatever error its blanket try/catch was swallowing.
+  const fullSelect = await supabase
+    .from("users")
+    .select("email, display_name, tier, is_content_editor")
+    .eq("email", authUser.email)
+    .single();
+
   return {
     hasAuthUser: true,
     authEmail: authUser.email,
     profileFound: Boolean(profile),
     profileError: profileError?.message ?? null,
+    fullSelectFound: Boolean(fullSelect.data),
+    fullSelectError: fullSelect.error?.message ?? null,
+    fullSelectErrorDetails: fullSelect.error
+      ? { code: fullSelect.error.code, details: fullSelect.error.details, hint: fullSelect.error.hint }
+      : null,
+    fullSelectData: fullSelect.data,
   };
 }
 
