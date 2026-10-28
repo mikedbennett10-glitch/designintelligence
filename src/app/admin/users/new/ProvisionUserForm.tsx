@@ -106,6 +106,13 @@ export default function ProvisionUserForm({ projects }: { projects: ProjectOptio
         />
       </div>
 
+      <div>
+        <label style={{ display: "flex", alignItems: "center", gap: "0.5rem", fontSize: "0.9rem" }}>
+          <input type="checkbox" name="isContentEditor" />
+          Can edit content (room Overview, Decision Logic, Intentional Omissions)
+        </label>
+      </div>
+
       <button
         type="submit"
         style={{

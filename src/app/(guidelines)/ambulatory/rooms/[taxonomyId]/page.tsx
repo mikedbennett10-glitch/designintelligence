@@ -3,6 +3,7 @@ import Link from "next/link";
 import RoomDataSheet from "@/components/guidelines/RoomDataSheet";
 import RoomLockContextBanner from "@/components/guidelines/RoomLockContextBanner";
 import type { VersionHistoryEntry } from "@/components/guidelines/VersionHistory";
+import { requireContentEditor } from "@/lib/auth";
 import { getActiveProject } from "@/lib/projectContext";
 import { createClient } from "@/lib/supabase/server";
 import type { ProjectWithEdition } from "@/lib/types/projects";
@@ -168,6 +169,7 @@ export default async function RoomDataSheetPage({
   const { taxonomyId } = await params;
   const { compareLive } = await searchParams;
   const activeProject = await getActiveProject();
+  const contentEditor = await requireContentEditor();
 
   let data: RoomPageData | null = null;
   let loadError: string | null = null;
@@ -234,6 +236,7 @@ export default async function RoomDataSheetPage({
       )}
       <RoomDataSheet
         {...data}
+        canEdit={Boolean(contentEditor)}
         actions={
           <>
             {activeProject && (

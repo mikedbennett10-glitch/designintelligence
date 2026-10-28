@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 
+import DecisionLogicEditor from "@/components/guidelines/DecisionLogicEditor";
 import DrawingViewer from "@/components/guidelines/DrawingViewer";
+import OverviewEditor from "@/components/guidelines/OverviewEditor";
 import SpecPanel from "@/components/guidelines/SpecPanel";
 import VersionHistory, {
   type VersionHistoryEntry,
@@ -19,18 +21,6 @@ import type {
 
 const TABS = ["Overview", "Decision Logic", "FFE", "Drawings", "Version History"] as const;
 type Tab = (typeof TABS)[number];
-
-const MEP_FIELDS: { key: keyof Room; label: string }[] = [
-  { key: "mep_lighting", label: "Lighting" },
-  { key: "mep_hvac", label: "HVAC" },
-  { key: "mep_plumbing", label: "Plumbing" },
-  { key: "mep_power_data", label: "Power / Data" },
-  { key: "mep_security", label: "Security" },
-  { key: "mep_av", label: "AV" },
-  { key: "mep_acoustic", label: "Acoustic" },
-  { key: "mep_nurse_call", label: "Nurse Call" },
-  { key: "mep_notes", label: "Additional Notes" },
-];
 
 function Badge({
   children,
@@ -72,6 +62,7 @@ export default function RoomDataSheet({
   drawings,
   versionHistory,
   actions,
+  canEdit = false,
 }: {
   room: Room;
   editionName: string;
@@ -83,9 +74,9 @@ export default function RoomDataSheet({
   drawings: RoomDrawing[];
   versionHistory: VersionHistoryEntry[];
   actions?: React.ReactNode;
+  canEdit?: boolean;
 }) {
   const [tab, setTab] = useState<Tab>("Overview");
-  const mepEntries = MEP_FIELDS.filter(({ key }) => Boolean(room[key]));
 
   return (
     <div>
@@ -168,102 +159,15 @@ export default function RoomDataSheet({
         })}
       </nav>
 
-      {tab === "Overview" && (
-        <div>
-          {room.description && (
-            <p style={{ maxWidth: "70ch", marginBottom: "1.5rem", lineHeight: 1.6 }}>
-              {room.description}
-            </p>
-          )}
-
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))",
-              gap: "1rem",
-              marginBottom: "2rem",
-            }}
-          >
-            <Fact label="Zone" value={room.zone} />
-            <Fact label="Same-handed" value={room.same_handed ? "Yes" : "No"} />
-            <Fact label="Ratio" value={room.ratio_note} />
-            <Fact label="Size" value={room.size_display} />
-            <Fact
-              label="Area"
-              value={room.size_area_sf ? `${room.size_area_sf} SF` : null}
-            />
-            <Fact label="Sizing note" value={room.size_notes} />
-          </div>
-
-          {mepEntries.length > 0 && (
-            <>
-              <h2 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>MEP / Systems</h2>
-              <div
-                style={{
-                  display: "grid",
-                  gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                  gap: "1rem",
-                }}
-              >
-                {mepEntries.map(({ key, label }) => (
-                  <Fact key={key} label={label} value={room[key] as string} />
-                ))}
-              </div>
-            </>
-          )}
-
-          {(room.adjacency_labels?.length ?? 0) > 0 && (
-            <div style={{ marginTop: "2rem" }}>
-              <h2 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>Adjacencies</h2>
-              <ul style={{ margin: 0, paddingLeft: "1.25rem" }}>
-                {room.adjacency_labels?.map((label, i) => (
-                  <li key={i} style={{ marginBottom: "0.25rem" }}>
-                    {label}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
-      )}
+      {tab === "Overview" && <OverviewEditor room={room} canEdit={canEdit} />}
 
       {tab === "Decision Logic" && (
-        <div>
-          <section style={{ marginBottom: "2rem" }}>
-            <h2 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>Why it&apos;s designed this way</h2>
-            {decisionLogic.length === 0 ? (
-              <p style={{ color: "var(--hint)", fontStyle: "italic" }}>
-                No decision logic recorded yet.
-              </p>
-            ) : (
-              decisionLogic.map((d) => (
-                <div key={d.id} style={{ marginBottom: "1rem" }}>
-                  {d.category && (
-                    <div style={{ fontSize: "0.75rem", fontWeight: 700, color: "var(--brand-blue-dk)", marginBottom: "0.2rem" }}>
-                      {d.category}
-                    </div>
-                  )}
-                  <p style={{ margin: 0 }}>{d.content}</p>
-                </div>
-              ))
-            )}
-          </section>
-          <section>
-            <h2 style={{ fontSize: "1rem", marginBottom: "0.75rem" }}>Intentionally omitted</h2>
-            {omissions.length === 0 ? (
-              <p style={{ color: "var(--hint)", fontStyle: "italic" }}>
-                Nothing recorded as intentionally omitted for this room.
-              </p>
-            ) : (
-              omissions.map((o) => (
-                <div key={o.id} style={{ marginBottom: "1rem" }}>
-                  <div style={{ fontWeight: 600, marginBottom: "0.15rem" }}>{o.item}</div>
-                  <p style={{ margin: 0, color: "var(--muted)" }}>{o.rationale}</p>
-                </div>
-              ))
-            )}
-          </section>
-        </div>
+        <DecisionLogicEditor
+          taxonomyId={room.taxonomy_id}
+          decisionLogic={decisionLogic}
+          omissions={omissions}
+          canEdit={canEdit}
+        />
       )}
 
       {tab === "FFE" && (
@@ -281,27 +185,6 @@ export default function RoomDataSheet({
       )}
 
       {tab === "Version History" && <VersionHistory entries={versionHistory} />}
-    </div>
-  );
-}
-
-function Fact({ label, value }: { label: string; value: string | null | undefined }) {
-  if (!value) return null;
-  return (
-    <div>
-      <div
-        style={{
-          fontSize: "0.7rem",
-          fontWeight: 700,
-          letterSpacing: "0.04em",
-          textTransform: "uppercase",
-          color: "var(--muted)",
-          marginBottom: "0.2rem",
-        }}
-      >
-        {label}
-      </div>
-      <div style={{ fontSize: "0.9rem" }}>{value}</div>
     </div>
   );
 }

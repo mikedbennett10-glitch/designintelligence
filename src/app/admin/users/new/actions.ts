@@ -39,6 +39,7 @@ export async function provisionExternalUser(
   const projectId = String(formData.get("projectId") ?? "").trim();
   const procoreRole = String(formData.get("procoreRole") ?? "").trim() || null;
   const expiresInDays = Number(formData.get("expiresInDays") ?? 90);
+  const isContentEditor = formData.get("isContentEditor") === "on";
 
   if (!email || !displayName) {
     return { ok: false, message: "Name and email are required." };
@@ -73,6 +74,7 @@ export async function provisionExternalUser(
       organization,
       is_active: true,
       expires_at: expiresAt,
+      is_content_editor: isContentEditor,
     },
     { onConflict: "email" }
   );

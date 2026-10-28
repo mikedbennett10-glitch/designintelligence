@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
@@ -36,10 +38,15 @@ export default async function ProvisionUserPage() {
   return (
     <div>
       <h1 style={{ fontSize: "1.4rem", marginBottom: "0.25rem" }}>Provision external user</h1>
-      <p style={{ color: "var(--muted)", marginBottom: "1.75rem", maxWidth: "60ch" }}>
+      <p style={{ color: "var(--muted)", marginBottom: "1rem", maxWidth: "60ch" }}>
         Creates the DIP user record, optionally links it to a project, and sends a magic-link
         invite email. WBS 5.2.1 — the manual provisioning workflow used until the Procore
         directory sync (5.2.2) is implemented.
+      </p>
+      <p style={{ marginBottom: "1.75rem" }}>
+        <Link href="/admin/users" style={{ color: "var(--brand-blue-dk)", fontSize: "0.85rem", fontWeight: 600 }}>
+          ← Manage existing users
+        </Link>
       </p>
       <ProvisionUserForm projects={projects} />
     </div>
