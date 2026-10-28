@@ -26,6 +26,10 @@ export default function LoginPage() {
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  const [otpCode, setOtpCode] = useState("");
+  const [otpStatus, setOtpStatus] = useState<"idle" | "verifying" | "error">("idle");
+  const [otpErrorMessage, setOtpErrorMessage] = useState<string | null>(null);
+
   const [pwEmail, setPwEmail] = useState("");
   const [password, setPassword] = useState("");
   const [pwStatus, setPwStatus] = useState<"idle" | "sending" | "error">("idle");
@@ -109,6 +113,29 @@ export default function LoginPage() {
     } catch (err) {
       setStatus("error");
       setErrorMessage(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
+    }
+  }
+
+  async function verifyOtpCode(e: React.FormEvent) {
+    e.preventDefault();
+    setOtpStatus("verifying");
+    setOtpErrorMessage(null);
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.verifyOtp({
+        email,
+        token: otpCode.trim(),
+        type: "email",
+      });
+      if (error) {
+        setOtpStatus("error");
+        setOtpErrorMessage(`${error.message} (status ${error.status ?? "?"}, code ${error.code ?? "?"})`);
+        return;
+      }
+      window.location.href = "/";
+    } catch (err) {
+      setOtpStatus("error");
+      setOtpErrorMessage(`Unexpected error: ${err instanceof Error ? err.message : String(err)}`);
     }
   }
 
@@ -217,10 +244,58 @@ export default function LoginPage() {
         </div>
 
         {status === "sent" ? (
-          <p style={{ fontSize: "0.85rem", color: "var(--brand-blue-dk)" }}>
-            Check <strong>{email}</strong> for a sign-in link. It&apos;ll only work if your
-            account has already been provisioned by the Platform Owner.
-          </p>
+          <>
+            <p style={{ fontSize: "0.85rem", color: "var(--brand-blue-dk)", marginBottom: "0.75rem" }}>
+              Check <strong>{email}</strong> for a sign-in link. It&apos;ll only work if your
+              account has already been provisioned by the Platform Owner.
+            </p>
+            <p style={{ fontSize: "0.78rem", color: "var(--muted)", marginBottom: "0.5rem" }}>
+              If the link says it&apos;s expired or invalid right away (common on corporate email
+              that pre-scans links), look in the same email for a 6-digit code instead and enter
+              it here:
+            </p>
+            <form onSubmit={verifyOtpCode} style={{ display: "flex", gap: "0.5rem" }}>
+              <input
+                type="text"
+                inputMode="numeric"
+                placeholder="123456"
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value)}
+                style={{
+                  flex: 1,
+                  padding: "0.6rem 0.75rem",
+                  borderRadius: "6px",
+                  border: "1px solid var(--border-strong)",
+                  fontSize: "0.9rem",
+                  boxSizing: "border-box",
+                  letterSpacing: "0.1em",
+                }}
+              />
+              <button
+                type="submit"
+                disabled={otpStatus === "verifying" || !otpCode.trim()}
+                style={{
+                  padding: "0.6rem 1rem",
+                  borderRadius: "6px",
+                  border: "none",
+                  background: "var(--brand-blue)",
+                  color: "#fff",
+                  fontSize: "0.9rem",
+                  fontWeight: 600,
+                  cursor: otpStatus === "verifying" ? "default" : "pointer",
+                  opacity: otpStatus === "verifying" ? 0.7 : 1,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                {otpStatus === "verifying" ? "Checking…" : "Verify code"}
+              </button>
+            </form>
+            {otpStatus === "error" && (
+              <p style={{ marginTop: "0.6rem", fontSize: "0.8rem", color: "var(--brand-pink)" }}>
+                {otpErrorMessage}
+              </p>
+            )}
+          </>
         ) : (
           <form onSubmit={sendMagicLink}>
             <input
