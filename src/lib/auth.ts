@@ -40,6 +40,46 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   }
 }
 
+/**
+ * Temporary diagnostic for the login-redirect-loop investigation. Reports
+ * exactly where the pipeline breaks (no Supabase session vs. a session with
+ * no readable `public.users` row) instead of collapsing both into `null`.
+ */
+export async function getCurrentUserDebug(): Promise<{
+  hasAuthUser: boolean;
+  authEmail: string | null;
+  profileFound: boolean;
+  profileError: string | null;
+}> {
+  const supabase = await createClient();
+  const {
+    data: { user: authUser },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (!authUser?.email) {
+    return {
+      hasAuthUser: false,
+      authEmail: null,
+      profileFound: false,
+      profileError: authError?.message ?? null,
+    };
+  }
+
+  const { data: profile, error: profileError } = await supabase
+    .from("users")
+    .select("email")
+    .eq("email", authUser.email)
+    .maybeSingle();
+
+  return {
+    hasAuthUser: true,
+    authEmail: authUser.email,
+    profileFound: Boolean(profile),
+    profileError: profileError?.message ?? null,
+  };
+}
+
 export async function requireAdmin(): Promise<CurrentUser | null> {
   const user = await getCurrentUser();
   return user?.tier === "administrative" ? user : null;

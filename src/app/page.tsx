@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import Header from "@/components/layout/Header";
-import { getCurrentUser } from "@/lib/auth";
+import { getCurrentUser, getCurrentUserDebug } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Project } from "@/lib/types/projects";
 
@@ -42,7 +42,41 @@ async function getMyProjects(): Promise<Project[]> {
 
 export default async function HomePage() {
   const user = await getCurrentUser();
-  if (!user) redirect("/login");
+
+  if (!user) {
+    // Temporary diagnostic for a login-redirect-loop report: distinguish
+    // "no Supabase session at all" (real logout -> redirect as normal) from
+    // "session exists but the public.users profile lookup failed" (surface
+    // it instead of silently bouncing back to /login with no explanation).
+    const debug = await getCurrentUserDebug();
+    if (!debug.hasAuthUser) redirect("/login");
+
+    return (
+      <div style={{ maxWidth: "640px", margin: "3rem auto", padding: "0 1.5rem" }}>
+        <h1 style={{ fontSize: "1.25rem", marginBottom: "0.75rem" }}>
+          Signed in, but your profile didn&apos;t load
+        </h1>
+        <p style={{ color: "var(--muted)", marginBottom: "1rem" }}>
+          Supabase accepted your sign-in (session email: <strong>{debug.authEmail}</strong>), but
+          the app couldn&apos;t find or read your <code>public.users</code> row, so it couldn&apos;t
+          finish logging you in. This is a temporary diagnostic page -- send this to the
+          Platform Owner:
+        </p>
+        <pre
+          style={{
+            padding: "1rem",
+            background: "var(--surface)",
+            border: "1px solid var(--border)",
+            borderRadius: "8px",
+            fontSize: "0.8rem",
+            whiteSpace: "pre-wrap",
+          }}
+        >
+          {JSON.stringify(debug, null, 2)}
+        </pre>
+      </div>
+    );
+  }
 
   let projects: Project[] = [];
   let loadError: string | null = null;
