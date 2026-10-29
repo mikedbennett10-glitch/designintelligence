@@ -8,9 +8,9 @@ import {
   getProductImages,
   uploadProductImage,
   type ActionResult,
-  type ItemType,
   type ProductImageItem,
 } from "./actions";
+import type { ItemType } from "./types";
 
 const inputStyle: React.CSSProperties = {
   padding: "0.55rem 0.7rem",

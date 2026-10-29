@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 import { requireAdmin } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 
+import { ITEM_TYPES, type ItemType } from "./types";
+
 export interface ActionResult {
   ok: boolean;
   message: string;
@@ -15,9 +17,6 @@ export interface ProductImageItem {
   path: string;
   url: string;
 }
-
-export const ITEM_TYPES = ["finishes", "equipment", "furniture"] as const;
-export type ItemType = (typeof ITEM_TYPES)[number];
 
 async function itemExists(itemType: ItemType, itemKey: string): Promise<boolean> {
   const supabase = await createClient();
