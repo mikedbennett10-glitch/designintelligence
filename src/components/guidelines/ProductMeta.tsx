@@ -45,11 +45,13 @@ export function ProductFacts({ facts }: { facts: { label: string; value: string 
 export function ProductExternalLinks({
   productUrl,
   revitModelUrl,
+  specSheetUrl,
 }: {
   productUrl: string | null;
   revitModelUrl?: string | null;
+  specSheetUrl?: string | null;
 }) {
-  if (!productUrl && !revitModelUrl) return null;
+  if (!productUrl && !revitModelUrl && !specSheetUrl) return null;
   return (
     <div style={{ display: "flex", flexWrap: "wrap", gap: "0.6rem", marginBottom: "1.5rem" }}>
       {productUrl && (
@@ -69,6 +71,26 @@ export function ProductExternalLinks({
           }}
         >
           View vendor product page →
+        </a>
+      )}
+      {specSheetUrl && (
+        <a
+          href={specSheetUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          download
+          style={{
+            display: "inline-block",
+            padding: "0.5rem 0.9rem",
+            borderRadius: "6px",
+            border: "1px solid var(--border-strong)",
+            color: "var(--muted)",
+            fontSize: "0.82rem",
+            fontWeight: 600,
+            textDecoration: "none",
+          }}
+        >
+          Download specification
         </a>
       )}
       {revitModelUrl && (

@@ -84,7 +84,7 @@ export default async function FinishDetailPage({
               { label: "Vendor contact", value: finish.vendor_contact },
             ]}
           />
-          <ProductExternalLinks productUrl={finish.product_url} />
+          <ProductExternalLinks productUrl={finish.product_url} specSheetUrl={finish.spec_sheet_url} />
           <UsedInRooms rooms={finish.usedInRooms} />
         </div>
       </div>

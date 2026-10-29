@@ -77,7 +77,11 @@ export default async function EquipmentDetailPage({
               { label: "Notes", value: equipment.notes },
             ]}
           />
-          <ProductExternalLinks productUrl={equipment.product_url} revitModelUrl={equipment.revit_model_url} />
+          <ProductExternalLinks
+            productUrl={equipment.product_url}
+            revitModelUrl={equipment.revit_model_url}
+            specSheetUrl={equipment.spec_sheet_url}
+          />
           <UsedInRooms rooms={equipment.usedInRooms} />
         </div>
       </div>

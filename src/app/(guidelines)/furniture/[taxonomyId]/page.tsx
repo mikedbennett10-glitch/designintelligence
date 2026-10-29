@@ -81,7 +81,11 @@ export default async function FurnitureDetailPage({
               { label: "Notes", value: furniture.notes },
             ]}
           />
-          <ProductExternalLinks productUrl={furniture.product_url} revitModelUrl={furniture.revit_model_url} />
+          <ProductExternalLinks
+            productUrl={furniture.product_url}
+            revitModelUrl={furniture.revit_model_url}
+            specSheetUrl={furniture.spec_sheet_url}
+          />
           <UsedInRooms rooms={furniture.usedInRooms} />
         </div>
       </div>

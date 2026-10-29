@@ -88,6 +88,7 @@ export interface Finish {
   swatch_gcs_path: string | null;
   room_applications: string[] | null;
   product_url: string | null;
+  spec_sheet_url: string | null;
   legacy_code: string | null;
   location: string | null;
   vendor_contact: string | null;
@@ -111,6 +112,7 @@ export interface Equipment {
   notes: string | null;
   product_url: string | null;
   revit_model_url: string | null;
+  spec_sheet_url: string | null;
   is_active: boolean;
   edition_id: number | null;
   created_at: string;
@@ -135,6 +137,7 @@ export interface Furniture {
   notes: string | null;
   product_url: string | null;
   revit_model_url: string | null;
+  spec_sheet_url: string | null;
   is_active: boolean;
   edition_id: number | null;
   created_at: string;
