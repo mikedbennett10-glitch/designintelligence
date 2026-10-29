@@ -78,7 +78,7 @@ export default async function ProjectsPage() {
               textDecoration: "none",
             }}
           >
-            + New project
+            Import From Projecto
           </Link>
         )}
       </div>
