@@ -85,8 +85,8 @@ export default async function AmbulatoryOverviewPage() {
 
   return (
     <div>
-      <div style={{ marginBottom: "2rem" }}>
-        <h1 style={{ fontSize: "1.75rem" }}>Ambulatory Design Guidelines</h1>
+      <div style={{ marginBottom: "1.1rem" }}>
+        <h1 style={{ fontSize: "1.75rem", marginBottom: "0.2rem" }}>Ambulatory Design Guidelines</h1>
         <p style={{ color: "var(--muted)", maxWidth: "60ch" }}>
           Room data sheets, prototype plans, and standards for ambulatory
           facility design.
@@ -117,13 +117,13 @@ export default async function AmbulatoryOverviewPage() {
       )}
 
       {groupBySection(rooms).map(([section, sectionRooms]) => (
-        <section key={section} style={{ marginBottom: "2.5rem" }}>
+        <section key={section} style={{ marginBottom: "1.5rem" }}>
           <h2
             style={{
               fontSize: "1.1rem",
               borderBottom: "1px solid var(--border)",
-              paddingBottom: "0.5rem",
-              marginBottom: "1rem",
+              paddingBottom: "0.4rem",
+              marginBottom: "0.75rem",
             }}
           >
             {section}

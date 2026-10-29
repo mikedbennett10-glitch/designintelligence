@@ -45,7 +45,7 @@ export default async function GuidelinesLayout({
         <Sidebar rooms={rooms} />
         <main
           className="dip-main-content"
-          style={{ flex: 1, minWidth: 0, padding: "2rem", overflowY: "auto" }}
+          style={{ flex: 1, minWidth: 0, padding: "1.1rem 2rem 2rem", overflowY: "auto" }}
         >
           {children}
         </main>
