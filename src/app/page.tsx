@@ -193,7 +193,7 @@ export default async function HomePage() {
             style={{
               display: "flex",
               flexWrap: "wrap",
-              justifyContent: "center",
+              justifyContent: "flex-start",
               gap: "1rem",
             }}
           >
@@ -226,12 +226,20 @@ export default async function HomePage() {
 
         <section>
           <h2 style={{ fontSize: "1.1rem", marginBottom: "0.45rem" }}>Training</h2>
-          <Link href="/certifications" className="tile-card" style={{ maxWidth: "220px" }}>
-            <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>Certifications</div>
-            <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
-              Your required training modules and completion status.
-            </div>
-          </Link>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "1rem" }}>
+            <Link href="/certifications" className="tile-card" style={{ width: "220px", flex: "0 1 220px" }}>
+              <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>Certifications</div>
+              <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
+                Your required training modules and completion status.
+              </div>
+            </Link>
+            <Link href="/tutorials" className="tile-card" style={{ width: "220px", flex: "0 1 220px" }}>
+              <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>Tutorials</div>
+              <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
+                Step-by-step guides and video walkthroughs for the platform.
+              </div>
+            </Link>
+          </div>
         </section>
       </main>
     </div>
