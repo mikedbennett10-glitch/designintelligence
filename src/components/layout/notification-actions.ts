@@ -13,15 +13,19 @@ export interface MyNotification {
 
 /** The signed-in user's own notifications (RLS: recipient_email = their email). */
 export async function getMyNotifications(): Promise<MyNotification[]> {
-  const supabase = await createClient();
-  const { data, error } = await supabase
-    .from("notifications")
-    .select("id, notification_type, subject, created_at, read_at, project_id")
-    .order("created_at", { ascending: false })
-    .limit(20);
+  try {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("notifications")
+      .select("id, notification_type, subject, created_at, read_at, project_id")
+      .order("created_at", { ascending: false })
+      .limit(20);
 
-  if (error) return [];
-  return (data ?? []) as MyNotification[];
+    if (error) return [];
+    return (data ?? []) as MyNotification[];
+  } catch {
+    return [];
+  }
 }
 
 /** Marks one of the signed-in user's own notifications as read. RLS (recipient_email = their email) scopes this to their own rows; only read_at is ever written. */

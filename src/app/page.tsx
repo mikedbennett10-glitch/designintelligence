@@ -186,19 +186,29 @@ export default async function HomePage() {
           <h2 style={{ fontSize: "1.1rem", marginBottom: "0.75rem" }}>Guidelines</h2>
           <div
             style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))",
+              display: "flex",
+              flexWrap: "wrap",
+              justifyContent: "center",
               gap: "1rem",
             }}
           >
             {GUIDELINE_MODES.map((mode) =>
               mode.comingSoon ? (
-                <div key={mode.href} className="tile-card tile-card--disabled">
+                <div
+                  key={mode.href}
+                  className="tile-card tile-card--disabled"
+                  style={{ width: "220px", flex: "0 1 220px" }}
+                >
                   <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{mode.label}</div>
                   <div style={{ fontSize: "0.82rem" }}>Coming soon</div>
                 </div>
               ) : (
-                <Link key={mode.href} href={mode.href} className="tile-card">
+                <Link
+                  key={mode.href}
+                  href={mode.href}
+                  className="tile-card"
+                  style={{ width: "220px", flex: "0 1 220px" }}
+                >
                   <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{mode.label}</div>
                   <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
                     {mode.description}

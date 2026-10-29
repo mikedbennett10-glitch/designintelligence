@@ -7,16 +7,10 @@ import { useState } from "react";
 import GlobalSearch from "@/components/layout/GlobalSearch";
 import ModeToggle from "@/components/layout/ModeToggle";
 import NotificationBell from "@/components/layout/NotificationBell";
+import UserMenu from "@/components/layout/UserMenu";
 import type { CurrentUser } from "@/lib/auth";
 
 export type HeaderUser = CurrentUser;
-
-const TIER_LABELS: Record<string, string> = {
-  internal_standard: "Internal",
-  external_project: "External · Project",
-  external_review: "External · Review",
-  administrative: "Administrator",
-};
 
 const navLinkStyle: React.CSSProperties = {
   fontSize: "0.75rem",
@@ -79,6 +73,7 @@ export default function Header({ user }: { user: HeaderUser | null }) {
         {user && (
           <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
             <NotificationBell />
+            <UserMenu user={user} />
             <button
               type="button"
               className="dip-mobile-menu-toggle"
@@ -125,29 +120,6 @@ export default function Header({ user }: { user: HeaderUser | null }) {
                   Admin
                 </Link>
               )}
-              <div style={{ textAlign: "right", lineHeight: 1.3 }}>
-                <div style={{ fontSize: "0.8rem", fontWeight: 600 }}>{user.displayName}</div>
-                <div style={{ fontSize: "0.7rem", color: "var(--muted)" }}>
-                  {TIER_LABELS[user.tier] ?? user.tier}
-                </div>
-              </div>
-              <form action="/auth/signout" method="post">
-                <button
-                  type="submit"
-                  style={{
-                    appearance: "none",
-                    background: "none",
-                    border: "1px solid var(--border-strong)",
-                    borderRadius: "6px",
-                    padding: "0.35rem 0.7rem",
-                    fontSize: "0.75rem",
-                    color: "var(--muted)",
-                    cursor: "pointer",
-                  }}
-                >
-                  Sign out
-                </button>
-              </form>
             </div>
           ) : (
             <Link
@@ -202,30 +174,8 @@ export default function Header({ user }: { user: HeaderUser | null }) {
               borderTop: "1px solid var(--border)",
             }}
           >
-            <div style={{ fontSize: "0.85rem", fontWeight: 600 }}>{user.displayName}</div>
-            <div style={{ fontSize: "0.72rem", color: "var(--muted)", marginBottom: "0.75rem" }}>
-              {TIER_LABELS[user.tier] ?? user.tier}
-            </div>
             <ModeToggle />
           </div>
-          <form action="/auth/signout" method="post" style={{ marginTop: "0.75rem" }}>
-            <button
-              type="submit"
-              style={{
-                width: "100%",
-                appearance: "none",
-                background: "none",
-                border: "1px solid var(--border-strong)",
-                borderRadius: "6px",
-                padding: "0.5rem 0.7rem",
-                fontSize: "0.8rem",
-                color: "var(--muted)",
-                cursor: "pointer",
-              }}
-            >
-              Sign out
-            </button>
-          </form>
         </div>
       )}
     </header>

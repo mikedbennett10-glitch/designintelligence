@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 
+import { BellIcon } from "./icons";
 import { getMyNotifications, markNotificationRead, type MyNotification } from "./notification-actions";
 
 function timeAgo(iso: string): string {
@@ -64,33 +65,23 @@ export default function NotificationBell() {
           borderRadius: "6px",
           border: "1px solid var(--border-strong)",
           background: "var(--surface)",
+          color: "var(--text)",
           cursor: "pointer",
-          fontSize: "1rem",
         }}
       >
-        🔔
+        <BellIcon />
         {unreadCount > 0 && (
           <span
             style={{
               position: "absolute",
-              top: "-4px",
-              right: "-4px",
-              minWidth: "16px",
-              height: "16px",
-              padding: "0 3px",
+              top: "3px",
+              right: "3px",
+              width: "7px",
+              height: "7px",
               borderRadius: "999px",
-              background: "var(--brand-pink)",
-              color: "#fff",
-              fontSize: "0.62rem",
-              fontWeight: 700,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              lineHeight: 1,
+              background: "var(--text)",
             }}
-          >
-            {unreadCount > 9 ? "9+" : unreadCount}
-          </span>
+          />
         )}
       </button>
 
