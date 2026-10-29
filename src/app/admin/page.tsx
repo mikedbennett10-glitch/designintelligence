@@ -33,6 +33,11 @@ const SECTIONS = [
     title: "Notifications",
     description: "View and retry the outbound notification queue.",
   },
+  {
+    href: "/admin/product-images",
+    title: "Product images",
+    description: "Upload or remove photos for finishes, equipment, and furniture.",
+  },
 ] as const;
 
 export default async function AdminHomePage() {
