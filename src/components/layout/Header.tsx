@@ -32,9 +32,9 @@ export default function Header({ user }: { user: HeaderUser | null }) {
       <div
         style={{
           height: "var(--header-height)",
-          display: "flex",
+          display: "grid",
+          gridTemplateColumns: "auto 1fr auto",
           alignItems: "center",
-          justifyContent: "space-between",
           padding: "0 1.5rem",
           gap: "1rem",
         }}
@@ -70,57 +70,60 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           />
         </Link>
 
-        {user && (
-          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
-            <NotificationBell />
-            <UserMenu user={user} />
-            <button
-              type="button"
-              className="dip-mobile-menu-toggle"
-              onClick={() => setMobileMenuOpen((open) => !open)}
-              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-              aria-expanded={mobileMenuOpen}
-              style={{
-                alignItems: "center",
-                justifyContent: "center",
-                width: "2.25rem",
-                height: "2.25rem",
-                borderRadius: "6px",
-                border: "1px solid var(--border-strong)",
-                background: "var(--surface)",
-                fontSize: "1.1rem",
-                cursor: "pointer",
-                flexShrink: 0,
-              }}
-            >
-              {mobileMenuOpen ? "✕" : "☰"}
-            </button>
+        {user ? (
+          <div className="dip-header-desktop-nav" style={{ justifySelf: "center" }}>
+            <ModeToggle />
           </div>
+        ) : (
+          <div />
         )}
 
-        <div
-          className="dip-header-desktop-nav"
-          style={{ display: "flex", alignItems: "center", gap: "1.25rem" }}
-        >
-          <ModeToggle />
-
+        <div style={{ justifySelf: "end", display: "flex", alignItems: "center", gap: "0.9rem" }}>
           {user ? (
-            <div style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
-              <Link href="/" style={navLinkStyle}>
-                Home
-              </Link>
-              <Link href="/projects" style={navLinkStyle}>
-                Projects
-              </Link>
-              <Link href="/certifications" style={navLinkStyle}>
-                Training
-              </Link>
-              {user.tier === "administrative" && (
-                <Link href="/admin" style={navLinkStyle}>
-                  Admin
+            <>
+              <div className="dip-header-desktop-nav" style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
+                <Link href="/" style={navLinkStyle}>
+                  Home
                 </Link>
-              )}
-            </div>
+                <Link href="/projects" style={navLinkStyle}>
+                  Projects
+                </Link>
+                <Link href="/certifications" style={navLinkStyle}>
+                  Training
+                </Link>
+                {user.tier === "administrative" && (
+                  <Link href="/admin" style={navLinkStyle}>
+                    Admin
+                  </Link>
+                )}
+              </div>
+
+              <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+                <NotificationBell />
+                <UserMenu user={user} />
+                <button
+                  type="button"
+                  className="dip-mobile-menu-toggle"
+                  onClick={() => setMobileMenuOpen((open) => !open)}
+                  aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+                  aria-expanded={mobileMenuOpen}
+                  style={{
+                    alignItems: "center",
+                    justifyContent: "center",
+                    width: "2.25rem",
+                    height: "2.25rem",
+                    borderRadius: "6px",
+                    border: "1px solid var(--border-strong)",
+                    background: "var(--surface)",
+                    fontSize: "1.1rem",
+                    cursor: "pointer",
+                    flexShrink: 0,
+                  }}
+                >
+                  {mobileMenuOpen ? "✕" : "☰"}
+                </button>
+              </div>
+            </>
           ) : (
             <Link
               href="/login"
