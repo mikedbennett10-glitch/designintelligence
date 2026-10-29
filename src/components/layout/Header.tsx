@@ -32,9 +32,10 @@ export default function Header({ user }: { user: HeaderUser | null }) {
       <div
         style={{
           height: "var(--header-height)",
-          display: "grid",
-          gridTemplateColumns: "auto 1fr auto",
+          position: "relative",
+          display: "flex",
           alignItems: "center",
+          justifyContent: "space-between",
           padding: "0 1.5rem",
           gap: "1rem",
         }}
@@ -70,15 +71,21 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           />
         </Link>
 
-        {user ? (
-          <div className="dip-header-desktop-nav" style={{ justifySelf: "center" }}>
+        {user && (
+          <div
+            className="dip-header-desktop-nav"
+            style={{
+              position: "absolute",
+              left: "50%",
+              top: "50%",
+              transform: "translate(-50%, -50%)",
+            }}
+          >
             <ModeToggle />
           </div>
-        ) : (
-          <div />
         )}
 
-        <div style={{ justifySelf: "end", display: "flex", alignItems: "center", gap: "0.9rem" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: "0.9rem" }}>
           {user ? (
             <>
               <div className="dip-header-desktop-nav" style={{ display: "flex", alignItems: "center", gap: "0.75rem" }}>
