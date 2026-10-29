@@ -11,16 +11,19 @@ const GUIDELINE_TYPE_LABELS: Record<string, string> = {
 };
 
 const thStyle: React.CSSProperties = {
-  padding: "0.5rem 0.75rem",
+  padding: "0.6rem 0.75rem",
   fontSize: "0.72rem",
   fontWeight: 700,
   letterSpacing: "0.02em",
   color: "var(--muted)",
   textTransform: "uppercase",
+  borderBottom: "1px solid var(--border)",
 };
 
 const tdStyle: React.CSSProperties = {
   padding: "0.65rem 0.75rem",
+  borderBottom: "1px solid var(--border)",
+  verticalAlign: "middle",
 };
 
 async function getProjects(): Promise<Project[]> {
@@ -98,10 +101,10 @@ export default async function ProjectsPage() {
           Owner can add you to an existing project.
         </p>
       ) : (
-        <div style={{ overflowX: "auto" }}>
+        <div style={{ overflowX: "auto", border: "1px solid var(--border)", borderRadius: "8px" }}>
           <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>
             <thead>
-              <tr style={{ textAlign: "left", borderBottom: "1px solid var(--border)" }}>
+              <tr style={{ textAlign: "left", background: "var(--bg)" }}>
                 <th style={thStyle}>Project Number</th>
                 <th style={thStyle}>Project Name</th>
                 <th style={thStyle}>Project Type</th>
@@ -111,7 +114,7 @@ export default async function ProjectsPage() {
             </thead>
             <tbody>
               {projects.map((project) => (
-                <tr key={project.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                <tr key={project.id} className="dip-table-row">
                   <td style={tdStyle}>
                     <Link
                       href={`/projects/${project.id}`}

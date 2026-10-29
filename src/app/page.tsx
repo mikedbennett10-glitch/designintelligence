@@ -34,16 +34,19 @@ const GUIDELINE_TYPE_LABELS: Record<string, string> = {
 };
 
 const homeThStyle: React.CSSProperties = {
-  padding: "0.4rem 0.75rem",
+  padding: "0.6rem 0.75rem",
   fontSize: "0.7rem",
   fontWeight: 700,
   letterSpacing: "0.02em",
   color: "var(--muted)",
   textTransform: "uppercase",
+  borderBottom: "1px solid var(--border)",
 };
 
 const homeTdStyle: React.CSSProperties = {
   padding: "0.6rem 0.75rem",
+  borderBottom: "1px solid var(--border)",
+  verticalAlign: "middle",
 };
 
 async function getMyProjects(): Promise<Project[]> {
@@ -148,10 +151,15 @@ export default async function HomePage() {
               No projects are assigned to you yet.
             </p>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
+            <div style={{ overflowX: "auto", border: "1px solid var(--border)", borderRadius: "8px" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem", tableLayout: "fixed" }}>
+                <colgroup>
+                  <col style={{ width: "26%" }} />
+                  <col style={{ width: "44%" }} />
+                  <col style={{ width: "30%" }} />
+                </colgroup>
                 <thead>
-                  <tr style={{ textAlign: "left", borderBottom: "1px solid var(--border)" }}>
+                  <tr style={{ textAlign: "left", background: "var(--bg)" }}>
                     <th style={homeThStyle}>Project Number</th>
                     <th style={homeThStyle}>Project Name</th>
                     <th style={homeThStyle}>Project Type</th>
@@ -159,7 +167,7 @@ export default async function HomePage() {
                 </thead>
                 <tbody>
                   {projects.map((project) => (
-                    <tr key={project.id} className="tile-card" style={{ borderBottom: "1px solid var(--border)" }}>
+                    <tr key={project.id} className="dip-table-row">
                       <td style={homeTdStyle}>
                         <Link
                           href={`/projects/${project.id}`}
@@ -168,7 +176,7 @@ export default async function HomePage() {
                           {project.procore_project_number}
                         </Link>
                       </td>
-                      <td style={homeTdStyle}>
+                      <td style={{ ...homeTdStyle, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {project.name || <span style={{ color: "var(--hint)" }}>—</span>}
                       </td>
                       <td style={homeTdStyle}>
