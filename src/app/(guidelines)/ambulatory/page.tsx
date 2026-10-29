@@ -86,8 +86,8 @@ export default async function AmbulatoryOverviewPage() {
   return (
     <div>
       <div style={{ marginBottom: "1.1rem" }}>
-        <h1 style={{ fontSize: "1.75rem", marginBottom: "0.2rem" }}>Ambulatory Design Guidelines</h1>
-        <p style={{ color: "var(--muted)", maxWidth: "60ch" }}>
+        <h1 style={{ fontSize: "1.75rem", margin: "0 0 0.2rem" }}>Ambulatory Design Guidelines</h1>
+        <p style={{ color: "var(--muted)", maxWidth: "60ch", margin: 0 }}>
           Room data sheets, prototype plans, and standards for ambulatory
           facility design.
         </p>
