@@ -29,26 +29,35 @@ export default async function TutorialsPage() {
 
         <section style={{ marginBottom: "1.75rem" }}>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.6rem" }}>Step-by-step guides</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
             {GUIDES.map((g) =>
               g.status === "available" ? (
                 <Link
                   key={g.slug}
                   href={`/tutorials/${g.slug}`}
                   className="tile-card"
-                  style={{ display: "block" }}
+                  style={{ display: "flex", flexDirection: "column", minHeight: "150px" }}
                 >
-                  <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{g.title}</div>
+                  <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{g.title}</div>
                   <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>{g.description}</div>
                 </Link>
               ) : (
-                <div key={g.slug} className="tile-card tile-card--disabled">
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                    <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{g.title}</div>
-                    <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.02em" }}>
-                      COMING SOON
-                    </span>
-                  </div>
+                <div
+                  key={g.slug}
+                  className="tile-card tile-card--disabled"
+                  style={{ display: "flex", flexDirection: "column", minHeight: "150px" }}
+                >
+                  <span
+                    style={{
+                      fontSize: "0.65rem",
+                      fontWeight: 700,
+                      letterSpacing: "0.02em",
+                      marginBottom: "0.5rem",
+                    }}
+                  >
+                    COMING SOON
+                  </span>
+                  <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{g.title}</div>
                   <div style={{ fontSize: "0.82rem" }}>{g.description}</div>
                 </div>
               )
@@ -58,15 +67,24 @@ export default async function TutorialsPage() {
 
         <section>
           <h2 style={{ fontSize: "1.05rem", marginBottom: "0.6rem" }}>Video tutorials</h2>
-          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: "1rem" }}>
             {VIDEOS.map((v) => (
-              <div key={v.slug} className="tile-card tile-card--disabled">
-                <div style={{ display: "flex", justifyContent: "space-between", alignItems: "baseline" }}>
-                  <div style={{ fontWeight: 700, marginBottom: "0.2rem" }}>{v.title}</div>
-                  <span style={{ fontSize: "0.7rem", fontWeight: 700, letterSpacing: "0.02em" }}>
-                    COMING SOON
-                  </span>
-                </div>
+              <div
+                key={v.slug}
+                className="tile-card tile-card--disabled"
+                style={{ display: "flex", flexDirection: "column", minHeight: "150px" }}
+              >
+                <span
+                  style={{
+                    fontSize: "0.65rem",
+                    fontWeight: 700,
+                    letterSpacing: "0.02em",
+                    marginBottom: "0.5rem",
+                  }}
+                >
+                  COMING SOON
+                </span>
+                <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>{v.title}</div>
                 <div style={{ fontSize: "0.82rem" }}>{v.description}</div>
               </div>
             ))}
