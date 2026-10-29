@@ -111,21 +111,18 @@ export default async function HomePage() {
   return (
     <div>
       <Header user={user} />
-      <main style={{ maxWidth: "960px", margin: "0 auto", padding: "1.5rem 1.5rem 2rem" }}>
-        <h1 style={{ fontSize: "1.6rem", marginBottom: "0.25rem" }}>
+      <main style={{ maxWidth: "960px", margin: "0 auto", padding: "1.1rem 1.5rem 1.5rem" }}>
+        <h1 style={{ fontSize: "1.6rem", marginBottom: "1.1rem" }}>
           Welcome, {user.displayName}
         </h1>
-        <p style={{ color: "var(--muted)", marginBottom: "1.5rem" }}>
-          Design & Construction — internal design standards platform.
-        </p>
 
-        <section style={{ marginBottom: "1.5rem" }}>
+        <section style={{ marginBottom: "1.1rem" }}>
           <div
             style={{
               display: "flex",
               justifyContent: "space-between",
               alignItems: "baseline",
-              marginBottom: "0.6rem",
+              marginBottom: "0.45rem",
             }}
           >
             <h2 style={{ fontSize: "1.1rem", margin: 0 }}>Your projects</h2>
@@ -190,8 +187,8 @@ export default async function HomePage() {
           )}
         </section>
 
-        <section style={{ marginBottom: "1.5rem" }}>
-          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.6rem" }}>Guidelines</h2>
+        <section style={{ marginBottom: "1.1rem" }}>
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.45rem" }}>Guidelines</h2>
           <div
             style={{
               display: "flex",
@@ -228,7 +225,7 @@ export default async function HomePage() {
         </section>
 
         <section>
-          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.6rem" }}>Training</h2>
+          <h2 style={{ fontSize: "1.1rem", marginBottom: "0.45rem" }}>Training</h2>
           <Link href="/certifications" className="tile-card" style={{ maxWidth: "220px" }}>
             <div style={{ fontWeight: 700, marginBottom: "0.4rem" }}>Certifications</div>
             <div style={{ fontSize: "0.82rem", color: "var(--muted)" }}>
