@@ -169,7 +169,12 @@ export default async function ProjectDetailPage({
         <div style={{ fontFamily: "monospace", fontSize: "0.8rem", color: "var(--muted)" }}>
           {project.guideline_types.join(", ")}
         </div>
-        <h1 style={{ fontSize: "1.5rem", margin: "0.2rem 0" }}>{project.procore_project_number}</h1>
+        <h1 style={{ fontSize: "1.5rem", margin: "0.2rem 0" }}>
+          {project.procore_project_number}
+          {project.name && (
+            <span style={{ fontWeight: 400, color: "var(--muted)" }}> · {project.name}</span>
+          )}
+        </h1>
         <form action={`/projects/${project.id}/enter`} method="post" style={{ display: "inline" }}>
           <button
             type="submit"

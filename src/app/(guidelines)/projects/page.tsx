@@ -4,6 +4,25 @@ import { getCurrentUser } from "@/lib/auth";
 import { createClient } from "@/lib/supabase/server";
 import type { Project } from "@/lib/types/projects";
 
+const GUIDELINE_TYPE_LABELS: Record<string, string> = {
+  AMBULATORY: "Ambulatory",
+  ACUTE: "Acute",
+  BUILDING_PERFORMANCE: "Building Performance",
+};
+
+const thStyle: React.CSSProperties = {
+  padding: "0.5rem 0.75rem",
+  fontSize: "0.72rem",
+  fontWeight: 700,
+  letterSpacing: "0.02em",
+  color: "var(--muted)",
+  textTransform: "uppercase",
+};
+
+const tdStyle: React.CSSProperties = {
+  padding: "0.65rem 0.75rem",
+};
+
 async function getProjects(): Promise<Project[]> {
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -79,58 +98,62 @@ export default async function ProjectsPage() {
           Owner can add you to an existing project.
         </p>
       ) : (
-        <div style={{ display: "flex", flexDirection: "column", gap: "0.75rem" }}>
-          {projects.map((project) => (
-            <div
-              key={project.id}
-              style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                padding: "1rem 1.25rem",
-                border: "1px solid var(--border)",
-                borderRadius: "8px",
-                background: "var(--surface)",
-              }}
-            >
-              <div>
-                <Link
-                  href={`/projects/${project.id}`}
-                  style={{
-                    fontFamily: "monospace",
-                    fontWeight: 600,
-                    fontSize: "0.9rem",
-                    color: "var(--brand-blue-dk)",
-                  }}
-                >
-                  {project.procore_project_number}
-                </Link>
-                <div style={{ fontSize: "0.8rem", color: "var(--muted)", marginTop: "0.2rem" }}>
-                  {project.guideline_types.join(", ")}
-                  {" · "}
-                  {project.room_types_in_scope?.length ?? 0} room types in scope
-                  {" · "}
-                  {project.edition_lock_id ? `Locked (${project.lock_event})` : "Edition not locked yet"}
-                </div>
-              </div>
-              <form action={`/projects/${project.id}/enter`} method="post">
-                <button
-                  type="submit"
-                  style={{
-                    padding: "0.5rem 0.9rem",
-                    borderRadius: "6px",
-                    border: "1px solid var(--border-strong)",
-                    background: "var(--surface)",
-                    fontSize: "0.82rem",
-                    fontWeight: 600,
-                    cursor: "pointer",
-                  }}
-                >
-                  Enter project mode
-                </button>
-              </form>
-            </div>
-          ))}
+        <div style={{ overflowX: "auto" }}>
+          <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.88rem" }}>
+            <thead>
+              <tr style={{ textAlign: "left", borderBottom: "1px solid var(--border)" }}>
+                <th style={thStyle}>Project Number</th>
+                <th style={thStyle}>Project Name</th>
+                <th style={thStyle}>Project Type</th>
+                <th style={thStyle}>Status</th>
+                <th style={{ ...thStyle, textAlign: "right" }} />
+              </tr>
+            </thead>
+            <tbody>
+              {projects.map((project) => (
+                <tr key={project.id} style={{ borderBottom: "1px solid var(--border)" }}>
+                  <td style={tdStyle}>
+                    <Link
+                      href={`/projects/${project.id}`}
+                      style={{
+                        fontFamily: "monospace",
+                        fontWeight: 600,
+                        color: "var(--brand-blue-dk)",
+                      }}
+                    >
+                      {project.procore_project_number}
+                    </Link>
+                  </td>
+                  <td style={tdStyle}>{project.name || <span style={{ color: "var(--hint)" }}>—</span>}</td>
+                  <td style={tdStyle}>
+                    {project.guideline_types.map((t) => GUIDELINE_TYPE_LABELS[t] ?? t).join(", ")}
+                  </td>
+                  <td style={{ ...tdStyle, color: "var(--muted)" }}>
+                    {project.edition_lock_id ? `Locked (${project.lock_event})` : "Edition not locked yet"}
+                  </td>
+                  <td style={{ ...tdStyle, textAlign: "right" }}>
+                    <form action={`/projects/${project.id}/enter`} method="post">
+                      <button
+                        type="submit"
+                        style={{
+                          padding: "0.4rem 0.8rem",
+                          borderRadius: "6px",
+                          border: "1px solid var(--border-strong)",
+                          background: "var(--surface)",
+                          fontSize: "0.8rem",
+                          fontWeight: 600,
+                          cursor: "pointer",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        Enter project mode
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
     </div>

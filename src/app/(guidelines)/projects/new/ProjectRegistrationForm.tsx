@@ -50,6 +50,13 @@ export default function ProjectRegistrationForm({ rooms }: { rooms: RoomOption[]
       </div>
 
       <div>
+        <label style={labelStyle} htmlFor="name">
+          Project name
+        </label>
+        <input id="name" name="name" placeholder="e.g. Mercy Hospital Ambulatory Expansion" style={inputStyle} />
+      </div>
+
+      <div>
         <span style={labelStyle}>Guideline type</span>
         <div style={{ display: "flex", gap: "1.25rem" }}>
           <label style={{ display: "flex", alignItems: "center", gap: "0.4rem", fontSize: "0.9rem" }}>

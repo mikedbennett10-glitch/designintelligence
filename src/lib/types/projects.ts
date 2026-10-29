@@ -3,6 +3,7 @@ import type { GuidelineType } from "@/lib/types/rooms";
 export interface Project {
   id: number;
   procore_project_number: string;
+  name: string | null;
   guideline_types: GuidelineType[];
   edition_lock_id: number | null;
   lock_date: string | null;

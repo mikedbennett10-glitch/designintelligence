@@ -6,6 +6,7 @@ import { useState } from "react";
 
 import GlobalSearch from "@/components/layout/GlobalSearch";
 import ModeToggle from "@/components/layout/ModeToggle";
+import NotificationBell from "@/components/layout/NotificationBell";
 import type { CurrentUser } from "@/lib/auth";
 
 export type HeaderUser = CurrentUser;
@@ -76,27 +77,30 @@ export default function Header({ user }: { user: HeaderUser | null }) {
         </Link>
 
         {user && (
-          <button
-            type="button"
-            className="dip-mobile-menu-toggle"
-            onClick={() => setMobileMenuOpen((open) => !open)}
-            aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
-            aria-expanded={mobileMenuOpen}
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              width: "2.25rem",
-              height: "2.25rem",
-              borderRadius: "6px",
-              border: "1px solid var(--border-strong)",
-              background: "var(--surface)",
-              fontSize: "1.1rem",
-              cursor: "pointer",
-              flexShrink: 0,
-            }}
-          >
-            {mobileMenuOpen ? "✕" : "☰"}
-          </button>
+          <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", flexShrink: 0 }}>
+            <NotificationBell />
+            <button
+              type="button"
+              className="dip-mobile-menu-toggle"
+              onClick={() => setMobileMenuOpen((open) => !open)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
+              aria-expanded={mobileMenuOpen}
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+                width: "2.25rem",
+                height: "2.25rem",
+                borderRadius: "6px",
+                border: "1px solid var(--border-strong)",
+                background: "var(--surface)",
+                fontSize: "1.1rem",
+                cursor: "pointer",
+                flexShrink: 0,
+              }}
+            >
+              {mobileMenuOpen ? "✕" : "☰"}
+            </button>
+          </div>
         )}
 
         <div
@@ -113,29 +117,12 @@ export default function Header({ user }: { user: HeaderUser | null }) {
               <Link href="/projects" style={navLinkStyle}>
                 Projects
               </Link>
+              <Link href="/certifications" style={navLinkStyle}>
+                Training
+              </Link>
               {user.tier === "administrative" && (
-                <Link href="/admin/deviations" style={navLinkStyle}>
-                  Deviations
-                </Link>
-              )}
-              {user.tier === "administrative" && (
-                <Link href="/admin/training" style={navLinkStyle}>
-                  Training
-                </Link>
-              )}
-              {user.tier === "administrative" && (
-                <Link href="/admin/notifications" style={navLinkStyle}>
-                  Notifications
-                </Link>
-              )}
-              {user.tier === "administrative" && (
-                <Link href="/admin/code-reference" style={navLinkStyle}>
-                  Code Reference
-                </Link>
-              )}
-              {user.tier === "administrative" && (
-                <Link href="/admin/users/new" style={navLinkStyle}>
-                  Provision user
+                <Link href="/admin" style={navLinkStyle}>
+                  Admin
                 </Link>
               )}
               <div style={{ textAlign: "right", lineHeight: 1.3 }}>
@@ -200,24 +187,13 @@ export default function Header({ user }: { user: HeaderUser | null }) {
           <MobileLink href="/projects" onClick={() => setMobileMenuOpen(false)}>
             Projects
           </MobileLink>
+          <MobileLink href="/certifications" onClick={() => setMobileMenuOpen(false)}>
+            Training
+          </MobileLink>
           {user.tier === "administrative" && (
-            <>
-              <MobileLink href="/admin/deviations" onClick={() => setMobileMenuOpen(false)}>
-                Deviations
-              </MobileLink>
-              <MobileLink href="/admin/training" onClick={() => setMobileMenuOpen(false)}>
-                Training
-              </MobileLink>
-              <MobileLink href="/admin/notifications" onClick={() => setMobileMenuOpen(false)}>
-                Notifications
-              </MobileLink>
-              <MobileLink href="/admin/code-reference" onClick={() => setMobileMenuOpen(false)}>
-                Code Reference
-              </MobileLink>
-              <MobileLink href="/admin/users/new" onClick={() => setMobileMenuOpen(false)}>
-                Provision user
-              </MobileLink>
-            </>
+            <MobileLink href="/admin" onClick={() => setMobileMenuOpen(false)}>
+              Admin
+            </MobileLink>
           )}
           <div
             style={{

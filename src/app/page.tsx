@@ -27,6 +27,25 @@ const GUIDELINE_MODES = [
   },
 ] as const;
 
+const GUIDELINE_TYPE_LABELS: Record<string, string> = {
+  AMBULATORY: "Ambulatory",
+  ACUTE: "Acute",
+  BUILDING_PERFORMANCE: "Building Performance",
+};
+
+const homeThStyle: React.CSSProperties = {
+  padding: "0.4rem 0.75rem",
+  fontSize: "0.7rem",
+  fontWeight: 700,
+  letterSpacing: "0.02em",
+  color: "var(--muted)",
+  textTransform: "uppercase",
+};
+
+const homeTdStyle: React.CSSProperties = {
+  padding: "0.6rem 0.75rem",
+};
+
 async function getMyProjects(): Promise<Project[]> {
   const supabase = await createClient();
   // RLS already scopes this to projects the user is a member of, or all
@@ -129,30 +148,36 @@ export default async function HomePage() {
               No projects are assigned to you yet.
             </p>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem" }}>
-              {projects.map((project) => (
-                <Link
-                  key={project.id}
-                  href={`/projects/${project.id}`}
-                  className="tile-card"
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    padding: "0.85rem 1.1rem",
-                    borderRadius: "8px",
-                  }}
-                >
-                  <span style={{ fontFamily: "monospace", fontWeight: 600, fontSize: "0.88rem" }}>
-                    {project.procore_project_number}
-                  </span>
-                  <span style={{ fontSize: "0.78rem", color: "var(--muted)" }}>
-                    {project.guideline_types.join(", ")}
-                    {" · "}
-                    {project.edition_lock_id ? "Locked" : "Not locked"}
-                  </span>
-                </Link>
-              ))}
+            <div style={{ overflowX: "auto" }}>
+              <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "0.85rem" }}>
+                <thead>
+                  <tr style={{ textAlign: "left", borderBottom: "1px solid var(--border)" }}>
+                    <th style={homeThStyle}>Project Number</th>
+                    <th style={homeThStyle}>Project Name</th>
+                    <th style={homeThStyle}>Project Type</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {projects.map((project) => (
+                    <tr key={project.id} className="tile-card" style={{ borderBottom: "1px solid var(--border)" }}>
+                      <td style={homeTdStyle}>
+                        <Link
+                          href={`/projects/${project.id}`}
+                          style={{ fontFamily: "monospace", fontWeight: 600, color: "var(--brand-blue-dk)" }}
+                        >
+                          {project.procore_project_number}
+                        </Link>
+                      </td>
+                      <td style={homeTdStyle}>
+                        {project.name || <span style={{ color: "var(--hint)" }}>—</span>}
+                      </td>
+                      <td style={homeTdStyle}>
+                        {project.guideline_types.map((t) => GUIDELINE_TYPE_LABELS[t] ?? t).join(", ")}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
           )}
         </section>

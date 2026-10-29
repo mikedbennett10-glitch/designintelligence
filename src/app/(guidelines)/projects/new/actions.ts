@@ -26,6 +26,7 @@ export async function createProject(
   }
 
   const procoreProjectNumber = String(formData.get("procoreProjectNumber") ?? "").trim();
+  const name = String(formData.get("name") ?? "").trim();
   const guidelineTypes = formData.getAll("guidelineTypes").map(String);
   const roomTypesInScope = formData.getAll("roomTypesInScope").map(String);
 
@@ -43,6 +44,7 @@ export async function createProject(
 
   const { error } = await projectsTable.insert({
     procore_project_number: procoreProjectNumber,
+    name: name || null,
     guideline_types: guidelineTypes,
     room_types_in_scope: roomTypesInScope,
   });
