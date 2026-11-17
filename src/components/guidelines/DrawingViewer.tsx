@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import SvgHotspotViewer from "@/components/guidelines/SvgHotspotViewer";
 import { buildTaxonomyLookup } from "@/lib/svgLookup";
@@ -89,33 +89,43 @@ export default function DrawingViewer({
   const activeLatest = activeType ? (byType.get(activeType)?.[0] ?? null) : null;
   const activeSchematic = activeType ? findSchematicForType(drawings, activeType) : null;
 
-  const [svgMarkup, setSvgMarkup] = useState<string | null>(null);
-  const [svgError, setSvgError] = useState<string | null>(null);
+  const [viewMode, setViewMode] = useState<"single" | "grid">("single");
 
-  useEffect(() => {
-    if (!activeSchematic?.file_name) {
-      setSvgMarkup(null);
-      setSvgError(null);
-      return;
-    }
-    let cancelled = false;
-    setSvgMarkup(null);
-    setSvgError(null);
-    fetch(activeSchematic.file_name)
+  // Shared by both view modes, keyed by file_name, so switching between them
+  // (or back to a drawing already seen) never re-fetches.
+  const [svgCache, setSvgCache] = useState<Record<string, string>>({});
+  const [svgErrors, setSvgErrors] = useState<Record<string, string>>({});
+  const fetchingRef = useRef<Set<string>>(new Set());
+
+  function ensureSvgLoaded(fileName: string | undefined | null) {
+    if (!fileName || fileName in svgCache || fileName in svgErrors) return;
+    if (fetchingRef.current.has(fileName)) return;
+    fetchingRef.current.add(fileName);
+    fetch(fileName)
       .then((res) => {
         if (!res.ok) throw new Error(String(res.status));
         return res.text();
       })
-      .then((text) => {
-        if (!cancelled) setSvgMarkup(text);
-      })
-      .catch(() => {
-        if (!cancelled) setSvgError("Couldn't load this drawing.");
-      });
-    return () => {
-      cancelled = true;
-    };
+      .then((text) => setSvgCache((prev) => ({ ...prev, [fileName]: text })))
+      .catch(() => setSvgErrors((prev) => ({ ...prev, [fileName]: "Couldn't load this drawing." })))
+      .finally(() => fetchingRef.current.delete(fileName));
+  }
+
+  useEffect(() => {
+    ensureSvgLoaded(activeSchematic?.file_name);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ensureSvgLoaded reads state via closure by design
   }, [activeSchematic?.file_name]);
+
+  useEffect(() => {
+    if (viewMode !== "grid") return;
+    for (const type of types) {
+      ensureSvgLoaded(findSchematicForType(drawings, type)?.file_name);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- ensureSvgLoaded reads state via closure by design
+  }, [viewMode, types, drawings]);
+
+  const svgMarkup = activeSchematic?.file_name ? (svgCache[activeSchematic.file_name] ?? null) : null;
+  const svgError = activeSchematic?.file_name ? (svgErrors[activeSchematic.file_name] ?? null) : null;
 
   if (types.length === 0) {
     return (
@@ -125,8 +135,108 @@ export default function DrawingViewer({
     );
   }
 
+  const viewToggle = (
+    <div style={{ display: "flex", gap: "0.4rem", marginBottom: "0.9rem" }}>
+      {(["single", "grid"] as const).map((mode) => (
+        <button
+          key={mode}
+          type="button"
+          onClick={() => setViewMode(mode)}
+          style={{
+            border: "1px solid " + (viewMode === mode ? "var(--brand-blue)" : "var(--border)"),
+            background: viewMode === mode ? "var(--brand-blue-lt)" : "var(--surface)",
+            color: viewMode === mode ? "var(--brand-blue-dk)" : "var(--text)",
+            borderRadius: "6px",
+            padding: "0.3rem 0.75rem",
+            fontSize: "0.78rem",
+            fontWeight: 600,
+            cursor: "pointer",
+            font: "inherit",
+          }}
+        >
+          {mode === "single" ? "Single view" : "Compare all"}
+        </button>
+      ))}
+    </div>
+  );
+
+  if (viewMode === "grid") {
+    return (
+      <div>
+        {viewToggle}
+        <div
+          style={{
+            display: "grid",
+            gridTemplateColumns: "repeat(auto-fill, minmax(260px, 1fr))",
+            gap: "1rem",
+          }}
+        >
+          {types.map((type) => {
+            const schematic = findSchematicForType(drawings, type);
+            const fileName = schematic?.file_name;
+            const markup = fileName ? (svgCache[fileName] ?? null) : null;
+            const error = fileName ? (svgErrors[fileName] ?? null) : null;
+            return (
+              <button
+                key={type}
+                type="button"
+                onClick={() => {
+                  setSelected(type);
+                  setViewMode("single");
+                }}
+                style={{
+                  textAlign: "left",
+                  border: "1px solid var(--border)",
+                  borderRadius: "8px",
+                  padding: "0.6rem",
+                  background: "var(--surface)",
+                  cursor: "pointer",
+                  font: "inherit",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: "0.4rem",
+                }}
+              >
+                <div style={{ fontWeight: 600, fontSize: "0.8rem" }}>{DRAWING_LABELS[type]}</div>
+                <div
+                  className="dip-svg-grid-cell"
+                  style={{
+                    aspectRatio: "4 / 3",
+                    background: "var(--brand-charcoal-lt)",
+                    borderRadius: "6px",
+                    overflow: "hidden",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  {markup ? (
+                    <div
+                      style={{ width: "100%", height: "100%", padding: "0.4rem" }}
+                      // eslint-disable-next-line react/no-danger -- markup is our own static /public asset, not user input
+                      dangerouslySetInnerHTML={{ __html: markup }}
+                    />
+                  ) : (
+                    <span style={{ fontSize: "0.72rem", color: "var(--hint)" }}>
+                      {!fileName ? "Not yet available" : error ? error : "Loading…"}
+                    </span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        <style>{`
+          .dip-svg-grid-cell svg { max-width: 100%; max-height: 100%; }
+        `}</style>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
+    <div>
+      {viewToggle}
+      <div style={{ display: "flex", gap: "1.25rem", alignItems: "flex-start" }}>
       <div
         style={{
           flex: "0 0 220px",
@@ -225,6 +335,7 @@ export default function DrawingViewer({
             {activeLatest?.gcs_path ? "Asset on file" : "Not yet available"}
           </div>
         )}
+      </div>
       </div>
     </div>
   );

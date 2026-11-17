@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+
+const COLLAPSE_STORAGE_KEY = "dip-sidebar-collapsed";
 
 export interface SidebarRoomItem {
   taxonomy_id: string;
@@ -67,6 +69,23 @@ export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
   const groups = groupRoomsBySection(rooms);
   const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
 
+  // Starts expanded on the server and every first client render, then syncs
+  // from localStorage right after mount -- avoids a hydration mismatch,
+  // at the cost of one visible frame at full width for a returning user
+  // who had it collapsed.
+  const [navCollapsed, setNavCollapsed] = useState(false);
+  useEffect(() => {
+    setNavCollapsed(localStorage.getItem(COLLAPSE_STORAGE_KEY) === "true");
+  }, []);
+
+  function toggleNavCollapsed() {
+    setNavCollapsed((prev) => {
+      const next = !prev;
+      localStorage.setItem(COLLAPSE_STORAGE_KEY, String(next));
+      return next;
+    });
+  }
+
   function toggleSection(section: string) {
     setCollapsed((prev) => {
       const next = new Set(prev);
@@ -77,6 +96,47 @@ export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
       }
       return next;
     });
+  }
+
+  if (navCollapsed) {
+    return (
+      <nav
+        aria-label="Guidelines navigation (collapsed)"
+        className="dip-sidebar"
+        style={{
+          width: "2.5rem",
+          flexShrink: 0,
+          borderRight: "1px solid var(--border)",
+          background: "var(--surface)",
+          height: "100%",
+          padding: "1.25rem 0",
+          display: "flex",
+          justifyContent: "center",
+        }}
+      >
+        <button
+          type="button"
+          onClick={toggleNavCollapsed}
+          aria-label="Expand navigation"
+          title="Expand navigation"
+          style={{
+            background: "none",
+            border: "1px solid var(--border)",
+            borderRadius: "6px",
+            cursor: "pointer",
+            width: "1.75rem",
+            height: "1.75rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--muted)",
+            fontSize: "0.75rem",
+          }}
+        >
+          &#9656;
+        </button>
+      </nav>
+    );
   }
 
   return (
@@ -93,6 +153,37 @@ export default function Sidebar({ rooms }: { rooms: SidebarRoomItem[] }) {
         padding: "1.25rem 0",
       }}
     >
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "flex-end",
+          padding: "0 1.25rem",
+          marginBottom: "0.75rem",
+        }}
+      >
+        <button
+          type="button"
+          onClick={toggleNavCollapsed}
+          aria-label="Collapse navigation"
+          title="Collapse navigation"
+          style={{
+            background: "none",
+            border: "1px solid var(--border)",
+            borderRadius: "6px",
+            cursor: "pointer",
+            width: "1.75rem",
+            height: "1.75rem",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            color: "var(--muted)",
+            fontSize: "0.75rem",
+          }}
+        >
+          &#9666;
+        </button>
+      </div>
+
       <StaticGroup title="Prototype Plans" items={PROTOTYPE_PLANS} />
 
       {groups.map(({ section, rooms: sectionRooms }) => {
